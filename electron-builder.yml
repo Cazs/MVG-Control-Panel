@@ -1,0 +1,29 @@
+appId: coza.mvg.travel
+copyright: Casper Ndlovu
+productName: MVG-Control-Panel
+publish:
+  - provider: github
+    owner: Cazs
+    repo: MVG-Control-Panel
+directories:
+  output: dist/
+mac:
+  category: public.app-category.business
+  target:
+    - zip
+    - dmg
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - ia32
+    - target: portable
+      arch:
+        - x64
+        - ia32
+linux:
+  category: Office
+  target:
+    - deb
+    - AppImage
