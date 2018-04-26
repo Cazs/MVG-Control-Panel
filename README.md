@@ -5,7 +5,7 @@
 <h2>
   MVG Control Panel
   <a href="https://github.com/Cazs/mvg-control-panel/releases">
-    <img src="https://img.shields.io/badge/version-1.1.4-green.svg" alt="v1.1.4">
+    <img src="https://img.shields.io/badge/version-1.1.4-green.svg" alt="v0.1.1">
   </a>
 </h2>
 
