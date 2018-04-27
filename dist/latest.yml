@@ -1,9 +1,0 @@
-version: 1.1.4
-files:
-  - url: mvg-control-panel-setup-1.1.4.exe
-    sha512: HZQjCW+oK+hBW55k7Ut3H/BqcZXB8i+k4HT6ewWQYzGS0HBNlzUgTgQvodnBiXNilUJ/wB78vEaEH/a3rg0FXg==
-    size: 90192476
-path: mvg-control-panel-setup-1.1.4.exe
-sha512: HZQjCW+oK+hBW55k7Ut3H/BqcZXB8i+k4HT6ewWQYzGS0HBNlzUgTgQvodnBiXNilUJ/wB78vEaEH/a3rg0FXg==
-sha2: b01ac3f837db56eb2b60dc806070beea932e832b2e67d04ceaadf3be773bd4a0
-releaseDate: '2018-04-26T18:37:06.488Z'
