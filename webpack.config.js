@@ -113,6 +113,9 @@ const commonConfig = merge([
           test: /\.jsx$/,
           exclude: [path.resolve(__dirname, 'node_modules')],
           loader: 'babel-loader',
+          query:{
+            presets: ['react']
+          }
         },
         {
           test: /\.css$/,

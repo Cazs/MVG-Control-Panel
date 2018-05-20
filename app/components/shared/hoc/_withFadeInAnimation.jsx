@@ -49,7 +49,7 @@ const _withFadeInTransition = ComposedComponent => props => {
       {values => (
         <div style={wrapperStyle}>
           {values.map(({ key, style }) => (
-            <div key={key} style={{ ...style, ...wrapperStyle }}>
+            <div key={key} style={{ style, wrapperStyle }}>
               <ComposedComponent {...props} />
             </div>
           ))}

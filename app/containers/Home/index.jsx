@@ -61,14 +61,17 @@ class Home extends Component
     super(props);
     this.btnAccommodation = React.createRef();
 
-    this.state = {
+    this.state =
+    {
       popover_right: '240px',
       popover_top: '0px',
       popover_visible: false,
       popover_context: null,
       profile_menu_visible: false,
+      // slider_height: window.innerHeight,
 
-      new_enquiry: {
+      new_enquiry:
+      {
         client_id: null,
         pickup_location: null,
         destination: null,
@@ -110,7 +113,7 @@ class Home extends Component
             }}
           >
             <Profile style={{marginTop: '-7px'}} onClick={()=>this.setState({profile_menu_visible: !this.state.profile_menu_visible})} />
-            <label style={{fontSize: '26pt', marginLeft: '30px', marginTop: '15px'}}>John Doe</label>
+            <label style={{fontSize: '26pt', marginLeft: '30px', marginTop: '15px', color: '#fff'}}>John Doe</label>
             <div style={{backgroundColor: 'lime'}}>
               <div style={{
                 width: '170px',
@@ -130,12 +133,12 @@ class Home extends Component
                 position: 'fixed',
                 // width: '300px',
                 left: '15px',
-                top: '130px',
-                backgroundColor: 'rgba(0,0,0,.7)',
+                top: '110px',
+                backgroundColor: 'rgba(0,0,0,.9)',
                 padding: '10px',
                 borderRadius: '10px',
                 boxShadow: '0px 0px 15px #000',
-                zIndex: 100,
+                zIndex: 1000,
                 border: '1px solid #000'
               }}
               hidden={!this.state.profile_menu_visible}
@@ -175,10 +178,11 @@ class Home extends Component
                 marginRight: '20px',
                 float: 'left',
                 width: '600px',
-                backgroundColor: 'rgba(0,0,0,.8)',
+                backgroundColor: 'rgba(0,0,0,.9)',
                 boxShadow: '0px 0px 35px #000',
                 borderRadius: '10px',
-                zIndex: 100
+                zIndex: 100,
+                padding: '15px'
               }}
               hidden={!this.state.popover_visible}
             >
@@ -380,12 +384,22 @@ class Home extends Component
             </Button>
           </div>
 
-          <Slider
-            images={images}
-            coolButtons
-            showDots
-            index={0}
-          />
+          <div
+            style={{
+              marginTop: '0px',
+              width: '100%',
+              height: '97vh',
+              backgroundColor: 'lime'
+            }}
+          >
+
+            <Slider
+              images={images}
+              coolButtons
+              showDots
+              index={0}
+            />
+          </div>
 
           {/* <button
             style={{marginTop: '300px'}}

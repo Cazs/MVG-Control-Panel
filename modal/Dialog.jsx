@@ -123,11 +123,11 @@ class Dialog extends PureComponent {
   }
 
   componentDidMount() {
-    ipc.on('update-modal', (e, dialogOptions, returnChannel, ...rest) => {
+    ipc.on('update-modal', (e, dialogOptions, returnChannel, rest) => {
       this.setState({
         returnChannel,
-        ...dialogOptions,
-        rest: [...rest],
+        dialogOptions,
+        rest: [rest],
       });
     });
   }
@@ -142,7 +142,7 @@ class Dialog extends PureComponent {
     const { rest, returnChannel } = this.state;
     // Only send IPC back if there's a channel present
     if (returnChannel !== '') {
-      mainWindow.send(returnChannel, parseInt(index), ...rest);
+      mainWindow.send(returnChannel, parseInt(index), rest);
     }
     // Close the windows
     BrowserWindow.getFocusedWindow().close();

@@ -10,7 +10,7 @@ const sounds = require('../../libs/sounds.js');
 
 const centerOnPrimaryDisplay = require('../../helpers/center-on-primary-display');
 
-function showModalWindow(dialogOptions, returnChannel = '', ...rest) {
+function showModalWindow(dialogOptions, returnChannel = '', rest) {
   const width = 450;
   const height = 220;
 
@@ -39,7 +39,7 @@ function showModalWindow(dialogOptions, returnChannel = '', ...rest) {
       'update-modal',
       dialogOptions,
       returnChannel,
-      ...rest
+      rest
     );
   });
   modalWin.on('ready-to-show', () => {

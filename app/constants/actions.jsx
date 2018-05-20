@@ -36,6 +36,18 @@ export const CLIENT_SET_STATUS = 'CLIENT_SET_STATUS';
 export const CLIENT_CONFIGS_SAVE = 'CLIENT_CONFIGS_SAVE';
 export const CLIENT_DUPLICATE = 'CLIENT_DUPLICATE';
 
+// SUPPLIER
+// ===========================================================
+export const SUPPLIER_NEW = 'SUPPLIER_NEW';
+export const SUPPLIER_UPDATE = 'SUPPLIER_UPDATE';
+export const SUPPLIER_EDIT = 'SUPPLIER_EDIT';
+export const SUPPLIER_SAVE = 'SUPPLIER_SAVE';
+export const SUPPLIER_DELETE = 'SUPPLIER_DELETE';
+export const SUPPLIER_GET_ALL = 'SUPPLIER_GET_ALL';
+export const SUPPLIER_SET_STATUS = 'SUPPLIER_SET_STATUS';
+export const SUPPLIER_CONFIGS_SAVE = 'SUPPLIER_CONFIGS_SAVE';
+export const SUPPLIER_DUPLICATE = 'INVOICE_DUPLICATE';
+
 // MATERIAL
 // ===========================================================
 export const MATERIAL_EDIT = 'MATERIAL_EDIT';

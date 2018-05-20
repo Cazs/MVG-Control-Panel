@@ -2,7 +2,7 @@ import * as ACTION_TYPES from '../constants/actions.jsx';
 import { handleActions } from 'redux-actions';
 
 const initialState = {
-  activeTab: 'form',
+  activeTab: 'login',
   notifications: [],
   checkUpdatesMessage: {},
 };
@@ -21,7 +21,7 @@ const UIReducer = handleActions(
 
     [ACTION_TYPES.UI_NOTIFICATION_NEW]: (state, action) =>
       Object.assign({}, state, {
-        notifications: [action.payload, ...state.notifications],
+        notifications: [action.payload], // , state.notifications.length>0 ? state.notifications:{}
       }),
 
     [ACTION_TYPES.UI_NOTIFICATION_REMOVE]: (state, action) =>

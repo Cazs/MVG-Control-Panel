@@ -19,25 +19,29 @@ const UIMiddleware = ({ getState }) => next => action =>
     // New Notification
     case ACTION_TYPES.UI_NOTIFICATION_NEW:
     {
-      // Play a sound based on notification type
-      switch (action.payload.type) {
-        case 'success': {
-          sounds.play('SUCCESS');
-          break;
+      console.log('>>>>', action);
+      if(action.payload.type !== undefined)
+      {
+        // Play a sound based on notification type
+        switch (action.payload.type) {
+          case 'success': {
+            sounds.play('SUCCESS');
+            break;
+          }
+          case 'warning': {
+            sounds.play('WARNING');
+            break;
+          }
         }
-        case 'warning': {
-          sounds.play('WARNING');
-          break;
-        }
-      }
-      // Create a new ID for the notification
-      return next(
-        Object.assign({}, action, {
-          payload: Object.assign({}, action.payload, {
-            id: uuidv4(),
-          }),
-        })
-      );
+        // Create a new ID for the notification
+        return next(
+          Object.assign({}, action, {
+            payload: Object.assign({}, action.payload, {
+              id: uuidv4(),
+            }),
+          })
+        );
+      } else return next(action);
     }
 
     // Default

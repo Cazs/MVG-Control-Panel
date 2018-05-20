@@ -19,98 +19,36 @@ const UsersMW = ({ dispatch, getState }) => next => action =>
     {
       // Get all Users
       return DataManager.getAll(dispatch, action, '/users', DataManager.db_users, 'users')
-                        .then(docs => next({type: ACTION_TYPES.USER_GET_ALL, payload: docs }));
+                        .then(docs =>
+                          next({type: ACTION_TYPES.USER_GET_ALL, payload: docs }))
+                        .catch(err =>
+                          next({ type: ACTION_TYPES.USER_GET_ALL, payload: []}));
     }
 
-    case ACTION_TYPES.USER_SAVE:
+    case ACTION_TYPES.USER_NEW:
     {
-      // Save doc to db
-      // return saveDoc('users', action.payload)
-      //   .then(newDocs => {
-      //     next({
-      //       type: ACTION_TYPES.USER_SAVE,
-      //       payload: newDocs,
-      //     });
-      //     dispatch({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'success',
-      //         message: i18n.t('messages:user:saved'),
-      //       },
-      //     });
-      //     // Preview Window
-      //     ipc.send('preview-user', action.payload);
-      //   })
-      //   .catch(err => {
-      //     next({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'warning',
-      //         message: err.message,
-      //       },
-      //     });
-      //   });
+      const new_user = Object.assign(action.payload, {object_number: getState().users.length});
+      // Save to remote store then local store
+      return DataManager.putRemoteResource(dispatch, DataManager.db_users, new_user, '/user', 'users')
+                        .then(response =>
+                        {
+                          const user = Object.assign(action.payload, {_id: response}); // w/ _id
+                          next({ type: ACTION_TYPES.USER_NEW, payload: user });
+                          if(action.callback)
+                            action.callback(user);
+                        })
+                        .catch(err =>
+                          next({ type: ACTION_TYPES.USER_NEW, payload: []}));
     }
 
-    case ACTION_TYPES.USER_EDIT:
+    case ACTION_TYPES.USER_UPDATE:
     {
-      // Continue
-      // return getAllDocs('contacts')
-      //   .then(allDocs => {
-      //     next(
-      //       Object.assign({}, action, {
-      //         payload: Object.assign({}, action.payload, {
-      //           contacts: allDocs
-      //         })
-      //       })
-      //     );
-      //     // Change Tab to Form
-      //     dispatch(UIActions.changeActiveTab('form'));
-      //   })
-      //   .catch(err => {
-      //     next({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'warning',
-      //         message: err.message,
-      //       },
-      //     });
-      //   });
-    }
-
-    case ACTION_TYPES.USER_DELETE:
-    {
-      // return deleteDoc('users', action.payload)
-      //   .then(remainingDocs => {
-      //     next({
-      //       type: ACTION_TYPES.USER_DELETE,
-      //       payload: remainingDocs,
-      //     });
-      //     // Send Notification
-      //     dispatch({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'success',
-      //         message: i18n.t('messages:user:deleted'),
-      //       },
-      //     });
-      //     // Clear form if this user is being editted
-      //     const { editMode } = getState().form.settings;
-      //     if (editMode.active) {
-      //       if (editMode.data._id === action.payload) {
-      //         dispatch({ type: ACTION_TYPES.FORM_CLEAR });
-      //       }
-      //     }
-      //   })
-      //   .catch(err => {
-      //     next({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'warning',
-      //         message: err.message,
-      //       },
-      //     });
-      //   });
+      console.log('user update:', action.payload);
+      return DataManager.postRemoteResource(dispatch, DataManager.db_users, action.payload, '/user', 'users')
+                        .then(response =>
+                          next({ type: ACTION_TYPES.USER_UPDATE, payload: response }))
+                        .catch(err =>
+                          next({ type: ACTION_TYPES.USER_UPDATE, payload: []}));
     }
 
     case ACTION_TYPES.USER_DUPLICATE:
@@ -126,75 +64,6 @@ const UsersMW = ({ dispatch, getState }) => next => action =>
         type: ACTION_TYPES.USER_SAVE,
         payload: duplicateUser,
       });
-    }
-
-    case ACTION_TYPES.USER_UPDATE:
-    {
-      // return updateDoc('users', action.payload)
-      //   .then(docs => {
-      //     next({
-      //       type: ACTION_TYPES.USER_UPDATE,
-      //       payload: docs,
-      //     });
-      //     dispatch({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'success',
-      //         message: i18n.t('messages:user:updated'),
-      //       },
-      //     });
-      //   })
-      //   .catch(err => {
-      //     next({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'warning',
-      //         message: err.message,
-      //       },
-      //     });
-      //   });
-    }
-
-    case ACTION_TYPES.USER_CONFIGS_SAVE:
-    {
-      // const { userID, configs } = action.payload;
-      // return getSingleDoc('users', userID)
-      //   .then(doc => {
-      //     dispatch({
-      //       type: ACTION_TYPES.USER_UPDATE,
-      //       payload: Object.assign({}, doc, {configs})
-      //     })
-      //   })
-      //   .catch(err => {
-      //     next({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'warning',
-      //         message: err.message,
-      //       },
-      //     });
-      //   });
-    }
-
-    case ACTION_TYPES.USER_SET_STATUS:
-    {
-      // const { userID, status } = action.payload;
-      // return getSingleDoc('users', userID)
-      //   .then(doc => {
-      //     dispatch({
-      //       type: ACTION_TYPES.USER_UPDATE,
-      //       payload: Object.assign({}, doc, { status })
-      //     })
-      //   })
-      //   .catch(err => {
-      //     next({
-      //       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-      //       payload: {
-      //         type: 'warning',
-      //         message: err.message,
-      //       },
-      //     });
-      //   });
     }
 
     default: {

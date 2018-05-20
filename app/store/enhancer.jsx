@@ -2,13 +2,13 @@
 
 // Retrieve Initial state from IndexDB
 const getInitialState = () => {};
-  /* Promise.all([ getAllDocs('employees'),
+  /* Promise.all([ getAllDocs('users'),
                 getAllDocs('clients'),
                 getAllDocs('invoices'),
                 getAllDocs('quotes'),
                 getAllDocs('quote_resources'),
                 getAllDocs('jobs'),
-                getAllDocs('job_employees'),
+                getAllDocs('job_users'),
                 getAllDocs('purchase_orders')])
     .then(values => ({
       contacts: values[0],

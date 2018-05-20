@@ -44,7 +44,7 @@ const PageHeaderStyle = styled.div`
   width: 100%;
   display: block;
   align-items: center;
-  height: auto;
+  height: 25px;
   background: #fff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 100;
@@ -89,8 +89,9 @@ const PageHeaderActionsStyle = styled.div`
 const PageContentStyle = styled.div`
   // flex: 1;
   // overflow: hidden;
-  margin: 45px 10px 10px 10px;
+  margin: 25px 10px 10px 10px;
   width: 100%;
+  height: 100%;
   ${props =>
     !props.bare &&
     `

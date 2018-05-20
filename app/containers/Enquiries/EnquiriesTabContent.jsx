@@ -314,7 +314,7 @@ export class Enquiries extends React.Component
               enquiry_revisions: row.revision,
               tasks: [],
               creator: SessionManager.session_usr.usr,
-              creator_employee: SessionManager.session_usr,
+              creator_user: SessionManager.session_usr,
               date_logged: new Date().getTime()/1000 // current date in epoch SECONDS
             }
 
@@ -705,7 +705,7 @@ export class Enquiries extends React.Component
                   <div>
                     <ComboBox 
                       ref={(cbx_contacts)=>this.cbx_contacts = cbx_contacts}
-                      items={this.props.employees}
+                      items={this.props.users}
                         // selected_item={this.state.new_enquiry.contact}
                       label='name'
                       onUpdate={(new_val)=>{
@@ -853,7 +853,7 @@ export class Enquiries extends React.Component
                   enquiry.account_name = client_name.toLowerCase().replace(' ', '-');
                   enquiry.creator_name = SessionManager.session_usr.name;
                   enquiry.creator = SessionManager.session_usr.usr;
-                  enquiry.creator_employee = SessionManager.session_usr;
+                  enquiry.creator_user = SessionManager.session_usr;
                   enquiry.date_logged = new Date().getTime()/1000;// current date in epoch SECONDS
 
                   this.setState({new_enquiry: enquiry, is_new_enquiry_modal_open: false});
@@ -1358,7 +1358,7 @@ Enquiries.propTypes =
 {
   dispatch: PropTypes.func.isRequired,
   // changeTab: PropTypes.func.isRequired,
-  employees: PropTypes.arrayOf(PropTypes.object).isRequired,
+  users: PropTypes.arrayOf(PropTypes.object).isRequired,
   materials: PropTypes.arrayOf(PropTypes.object).isRequired,
   clients: PropTypes.arrayOf(PropTypes.object).isRequired,
   enquiries: PropTypes.arrayOf(PropTypes.object).isRequired
@@ -1367,7 +1367,7 @@ Enquiries.propTypes =
 // Map state to props & Export
 const mapStateToProps = state => (
 {
-  employees: getUsers(state),
+  users: getUsers(state),
   enquiries: getEnquiries(state),
   clients: getClients(state),
   materials: getMaterials(state)

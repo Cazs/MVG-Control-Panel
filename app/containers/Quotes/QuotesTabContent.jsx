@@ -314,7 +314,7 @@ export class Quotes extends React.Component
               quote_revisions: row.revision,
               tasks: [],
               creator: SessionManager.session_usr.usr,
-              creator_employee: SessionManager.session_usr,
+              creator_user: SessionManager.session_usr,
               date_logged: new Date().getTime()/1000 // current date in epoch SECONDS
             }
 
@@ -705,7 +705,7 @@ export class Quotes extends React.Component
                   <div>
                     <ComboBox 
                       ref={(cbx_contacts)=>this.cbx_contacts = cbx_contacts}
-                      items={this.props.employees}
+                      items={this.props.users}
                         // selected_item={this.state.new_quote.contact}
                       label='name'
                       onUpdate={(new_val)=>{
@@ -853,7 +853,7 @@ export class Quotes extends React.Component
                   quote.account_name = client_name.toLowerCase().replace(' ', '-');
                   quote.creator_name = SessionManager.session_usr.name;
                   quote.creator = SessionManager.session_usr.usr;
-                  quote.creator_employee = SessionManager.session_usr;
+                  quote.creator_user = SessionManager.session_usr;
                   quote.date_logged = new Date().getTime()/1000;// current date in epoch SECONDS
 
                   this.setState({new_quote: quote, is_new_quote_modal_open: false});
@@ -1358,7 +1358,7 @@ Quotes.propTypes =
 {
   dispatch: PropTypes.func.isRequired,
   // changeTab: PropTypes.func.isRequired,
-  employees: PropTypes.arrayOf(PropTypes.object).isRequired,
+  users: PropTypes.arrayOf(PropTypes.object).isRequired,
   materials: PropTypes.arrayOf(PropTypes.object).isRequired,
   clients: PropTypes.arrayOf(PropTypes.object).isRequired,
   quotes: PropTypes.arrayOf(PropTypes.object).isRequired
@@ -1367,7 +1367,7 @@ Quotes.propTypes =
 // Map state to props & Export
 const mapStateToProps = state => (
 {
-  employees: getUsers(state),
+  users: getUsers(state),
   quotes: getQuotes(state),
   clients: getClients(state),
   materials: getMaterials(state)
