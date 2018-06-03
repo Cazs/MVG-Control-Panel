@@ -57,3 +57,4 @@ class SessionManager
 const sessionManager = new SessionManager();
 
 export default sessionManager;
+export const getSessionUser = sessionManager.getSessionUser;

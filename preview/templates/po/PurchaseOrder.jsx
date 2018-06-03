@@ -159,8 +159,8 @@ function PurchaseOrder({ pdf_data, configs, t })
               <td>
                 <strong>PurchaseOrder No.</strong>
                 <i style={{marginLeft: '15px'}}>
-                  {SessionManager.session_usr.firstname}-
-                  {SessionManager.session_usr.firstname.charAt(0) + SessionManager.session_usr.lastname.charAt(0)}-00
+                  {SessionManager.getSessionUser().firstname}-
+                  {SessionManager.getSessionUser().firstname.charAt(0) + SessionManager.getSessionUser().lastname.charAt(0)}-00
                   {pdf_data.object_number}
                   {/* &nbsp;REV&nbsp;{pdf_data.revision} */}
                 </i>
@@ -176,15 +176,15 @@ function PurchaseOrder({ pdf_data, configs, t })
             <tr>
               <td><p>Company: {pdf_data.supplier.supplier_name}</p></td>
               <td>
-                <p>Sale Consultant: {SessionManager.session_usr.name} </p>
+                <p>Sale Consultant: {SessionManager.getSessionUser().name} </p>
               </td>
             </tr>
 
             <tr>
               <td><p>Cell: {pdf_data.contact.cell}</p></td>
               <td>
-                <p>Consultant Cell: {SessionManager.session_usr.cell} </p>
-                <p>Consultant eMail: {SessionManager.session_usr.email} </p>
+                <p>Consultant Cell: {SessionManager.getSessionUser().cell} </p>
+                <p>Consultant eMail: {SessionManager.getSessionUser().email} </p>
               </td>
             </tr>
 

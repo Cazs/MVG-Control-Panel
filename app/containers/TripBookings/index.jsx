@@ -5,6 +5,11 @@ import { compose } from 'recompose';
 import { connect } from 'react-redux';
 import { isEqual } from 'lodash';
 
+// Selectors
+import { getUsers } from '../../reducers/UsersReducer';
+import { getMaterials } from '../../reducers/MaterialsReducer';
+import { getClients } from '../../reducers/ClientsReducer';
+
 // Components
 import { Field, Part, Row } from '../../components/shared/Part';
 import Button from '../../components/shared/Button';
@@ -20,15 +25,15 @@ import
 import _withFadeInAnimation from '../../components/shared/hoc/_withFadeInAnimation';
 
 // Tab content Components
-import EnquiriesTabContent from './EnquiriesTabContent';
+import TripBookingsContent from './TripBookingsContent';
 
 // Component
-class Enquiries extends Component
+class Bookings extends Component
 {
   constructor(props)
   {
     super(props);
-    this.state = { visibleTab: 'Enquiries' };
+    this.state = { visibleTab: 'Trips' };
     this.header_actions = React.createRef();
   }
 
@@ -45,7 +50,7 @@ class Enquiries extends Component
     return (
       <PageWrapper>
         <PageHeader>
-          <PageHeaderTitle>Enquiries | {this.state.visibleTab}</PageHeaderTitle>
+          <PageHeaderTitle>Bookings | {this.state.visibleTab}</PageHeaderTitle>
           <PageHeaderActions>
             <div style={{display: 'inline', float: 'right', marginTop: '-30px', paddingRight: '100px', borderBottom: '2px', borderColor: 'black'}}>
               <Button success onClick={()=>this.props.changeTab('home')}>
@@ -53,23 +58,9 @@ class Enquiries extends Component
               </Button>
             </div>
           </PageHeaderActions>
-          <Tabs style={{backgroundColor: 'lime', borderTop: '2px solid black', marginTop: '30px', zIndex: '90'}}>
-            <Tab
-              href="#"
-              className={this.state.visibleTab === 'Enquiries' ? 'active' : ''}
-              onClick={() => this.changeTab('Enquiries')}
-            >
-              Enquiries
-            </Tab>
-          </Tabs>
         </PageHeader>
         <PageContent>
-          
-          <TabContent>
-            {this.state.visibleTab === 'Enquiries' && (
-              <EnquiriesTabContent />
-            )}
-          </TabContent>
+          <TripBookingsContent />
         </PageContent>
       </PageWrapper>
     );
@@ -77,18 +68,24 @@ class Enquiries extends Component
 }
 
 // PropTypes Validation
-Enquiries.propTypes =
+Bookings.propTypes =
 {
   dispatch: PropTypes.func.isRequired,
-  changeTab: PropTypes.func.isRequired
+  changeTab: PropTypes.func.isRequired,
+  users: PropTypes.arrayOf(PropTypes.object).isRequired,
+  materials: PropTypes.arrayOf(PropTypes.object).isRequired,
+  clients: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
 // Map state to props & Export
 const mapStateToProps = state => (
 {
+  users: getUsers(state),
+  clients: getClients(state),
+  materials: getMaterials(state)
 });
 
 export default compose(
   connect(mapStateToProps),
   _withFadeInAnimation
-)(Enquiries);
+)(Bookings);

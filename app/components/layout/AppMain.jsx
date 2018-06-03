@@ -6,10 +6,10 @@ import PropTypes from 'prop-types';
 import Login from '../../containers/Login';
 import Signup from '../../containers/Signup';
 import Home from '../../containers/Home';
-import Enquiries from '../../containers/Enquiries';
-import Quotes from '../../containers/Quotes';
-// import Trips from '../../containers/Trips';
-// import Invoices from '../../containers/Invoices';
+import TripBookings from '../../containers/TripBookings';
+import AccommodationBookings from '../../containers/AccommodationBookings';
+// import TripHistory from '../../containers/Trips';
+// import AccommodationHistory from '../../containers/Invoices';
 // import Messages from '../../containers/Messages';
 import Settings from '../../containers/Settings';
 
@@ -31,10 +31,10 @@ class AppMain extends Component
         {activeTab === 'signup' && <Signup changeTab={this.props.changeTab} setLoading={this.props.setLoading} />}
         {activeTab === 'login' && <Login changeTab={this.props.changeTab} setLoading={this.props.setLoading} />}
         {activeTab === 'home' && <Home changeTab={this.props.changeTab} setLoading={this.props.setLoading} />}
-        {activeTab === 'enquiries' && <Enquiries changeTab={this.props.changeTab} setLoading={this.props.setLoading} />}
-        {activeTab === 'quotes' && <Quotes changeTab={this.props.changeTab} setLoading={this.props.setLoading} />}
-        {/* {activeTab === 'trips' && <Trips />} */}
-        {/* {activeTab === 'invoices' && <Invoices />} */}
+        {activeTab === 'trip-bookings' && <TripBookings changeTab={this.props.changeTab} setLoading={this.props.setLoading} />}
+        {activeTab === 'accommodation-bookings' && <AccommodationBookings changeTab={this.props.changeTab} setLoading={this.props.setLoading} />}
+        {/* {activeTab === 'trip-history' && <TripHistory />} */}
+        {/* {activeTab === 'accommodation-history' && <AccommodationHistory />} */}
         {/* {activeTab === 'messages' && <Messages />} */}
         {activeTab === 'settings' && <Settings setLoading={this.props.setLoading} />}
       </AppMainContent>

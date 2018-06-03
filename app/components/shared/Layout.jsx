@@ -44,7 +44,7 @@ const PageHeaderStyle = styled.div`
   width: 100%;
   display: block;
   align-items: center;
-  height: 25px;
+  height: 45px;
   background: #fff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 100;

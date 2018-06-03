@@ -23,10 +23,7 @@ import * as ACTION_TYPES from '../../constants/actions.jsx';
 import * as UIActions from '../../actions/ui';
 
 // Selectors
-import { getUsers } from '../../reducers/UsersReducer';
-import { getMaterials } from '../../reducers/MaterialsReducer';
-import { getClients } from '../../reducers/ClientsReducer';
-import { getQuotes } from '../../reducers/QuotesReducer';
+import { getAccommodationBookings } from '../../reducers/AccommodationBookingsReducer';
 
 // Components
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
@@ -70,16 +67,16 @@ const modalStyle =
   }
 };
 
-export class Quotes extends React.Component
+export class Enquiries extends React.Component
 {
   constructor(props)
   {
     super(props);
     
-    this.editQuote = this.editQuote.bind(this);
-    this.deleteQuote = this.deleteQuote.bind(this);
-    this.duplicateQuote = this.duplicateQuote.bind(this);
-    this.setQuoteStatus = this.setQuoteStatus.bind(this);
+    this.editEnquiry = this.editEnquiry.bind(this);
+    this.deleteEnquiry = this.deleteEnquiry.bind(this);
+    this.duplicateEnquiry = this.duplicateEnquiry.bind(this);
+    this.setEnquiryStatus = this.setEnquiryStatus.bind(this);
     this.expandComponent = this.expandComponent.bind(this);
     
     // this.creator_ref = React.createRef();
@@ -90,9 +87,9 @@ export class Quotes extends React.Component
     this.col_toggles_container = null;
     this.col_width = 235;
     this.state = {  filter: null,
-                    is_new_quote_modal_open: false,
-                    is_quote_items_modal_open: false,
-                    selected_quote: null,
+                    is_new_enquiry_modal_open: false,
+                    is_enquiry_items_modal_open: false,
+                    selected_enquiry: null,
                     active_row: null,
                     column_toggles_top: -200,
                     // Table Column Toggles
@@ -107,8 +104,8 @@ export class Quotes extends React.Component
                     col_status_visible: true,
                     col_creator_visible: false,
                     col_date_logged_visible: false,
-                    // Quote to be created
-                    new_quote:
+                    // Enquiry to be created
+                    new_enquiry:
                     {
                       client_id: null,
                       client: null,
@@ -121,8 +118,8 @@ export class Quotes extends React.Component
                       status: 0,
                       resources: []
                     },
-                    // Quote Item to be added
-                    new_quote_item:
+                    // Enquiry Item to be added
+                    new_enquiry_item:
                     {
                       resource_id: null,
                       unit_cost: 0,
@@ -133,15 +130,15 @@ export class Quotes extends React.Component
     };
   }
 
-  // Load Quotes & add event listeners
+  // Load Enquiries & add event listeners
   componentDidMount()
   {
     // Add Event Listener
-    ipc.on('confirmed-delete-quote', (event, index, quoteId) =>
+    ipc.on('confirmed-delete-enquiry', (event, index, enquiryId) =>
     {
       if (index === 0)
       {
-        this.confirmedDeleteQuote(quoteId);
+        this.confirmedDeleteEnquiry(enquiryId);
       }
     });
   }
@@ -149,11 +146,11 @@ export class Quotes extends React.Component
   // Remove all IPC listeners when unmounted
   componentWillUnmount()
   {
-    ipc.removeAllListeners('confirmed-delete-quote');
+    ipc.removeAllListeners('confirmed-delete-enquiry');
   }
 
   // Open Confirm Dialog
-  deleteQuote(quoteId)
+  deleteEnquiry(enquiryId)
   {
     openDialog(
       {
@@ -165,42 +162,42 @@ export class Quotes extends React.Component
           'No'
         ],
       },
-      'confirmed-delete-quote',
-      quoteId
+      'confirmed-delete-enquiry',
+      enquiryId
     );
   }
 
-  showQuotePreview(quote)
+  showEnquiryPreview(enquiry)
   {
     // Preview Window
-    ipc.send('preview-quote', quote);
+    ipc.send('preview-enquiry', enquiry);
   }
 
-  // Confirm Delete an quote
-  confirmedDeleteQuote(quoteId)
+  // Confirm Delete an enquiry
+  confirmedDeleteEnquiry(enquiryId)
   {
     const { dispatch } = this.props;
-    // dispatch(Actions.deleteQuote(quoteId));
+    // dispatch(Actions.deleteEnquiry(enquiryId));
   }
 
-  // set the quote status
-  setQuoteStatus(quoteId, status)
+  // set the enquiry status
+  setEnquiryStatus(enquiryId, status)
   {
     alert('set status to: ' + status);
     const { dispatch } = this.props;
-    // dispatch(Actions.setQuoteStatus(quoteId, status));
+    // dispatch(Actions.setEnquiryStatus(enquiryId, status));
   }
 
-  editQuote(quote)
+  editEnquiry(enquiry)
   {
     const { dispatch } = this.props;
-    // dispatch(Actions.editQuote(quote));
+    // dispatch(Actions.editEnquiry(enquiry));
   }
 
-  duplicateQuote(quote)
+  duplicateEnquiry(enquiry)
   {
     const { dispatch } = this.props;
-    // dispatch(Actions.duplicateQuote(quote));
+    // dispatch(Actions.duplicateEnquiry(enquiry));
   }
 
   setFilter(event)
@@ -264,7 +261,7 @@ export class Quotes extends React.Component
       mode: 'click',
         // if product id less than 3, will cause the whole row noneditable
         // this function should return an array of row keys
-        // quotes.filter(q => q.id < 3).map(p => p.id)
+        // enquiries.filter(q => q.id < 3).map(p => p.id)
       nonEditableRows: () => ['_id', 'object_number'],
       blurToSave: true
       // beforeSaveCell: {},// this.onBeforeSaveCell, // a hook for before saving cell
@@ -277,9 +274,9 @@ export class Quotes extends React.Component
       defaultSortOrder: 'asc'
     };
 
-    const quote_options = (
+    const enquiry_options = (
       <div>
-        <CustomButton primary onClick={() => this.showQuotePreview(row)}>PDF Preview</CustomButton>
+        <CustomButton primary onClick={() => this.showEnquiryPreview(row)}>PDF Preview</CustomButton>
         <CustomButton
           primary
           style={{marginLeft: '15px'}}
@@ -291,7 +288,7 @@ export class Quotes extends React.Component
             //     type: ACTION_TYPES.UI_NOTIFICATION_NEW,
             //     payload: {
             //       type: 'danger',
-            //       message: 'Error: Quote has not yet been approved',
+            //       message: 'Error: Enquiry has not yet been approved',
             //     },
             //   });
             // }
@@ -299,9 +296,9 @@ export class Quotes extends React.Component
             // Prepare Trip
             const new_trip =
             {
-              // object_number = this.props.quotes.length,
-              quote_id: row._id,
-              quote: row,
+              // object_number = this.props.enquiries.length,
+              enquiry_id: row._id,
+              enquiry: row,
               client_name: row.client_name,
               client: row.client,
               contact_person: row.contact_person,
@@ -311,7 +308,7 @@ export class Quotes extends React.Component
               vat: row.vat,
               creator_name: SessionManager.getSessionUser().name,
               status: 0,
-              quote_revisions: row.revision,
+              enquiry_revisions: row.revision,
               tasks: [],
               creator: SessionManager.getSessionUser().usr,
               creator_user: SessionManager.getSessionUser(),
@@ -335,11 +332,11 @@ export class Quotes extends React.Component
       </div>
     );
 
-    const new_quote_item_form = (
+    const new_enquiry_item_form = (
       <div>
-        {/* form for adding a new QuoteItem */}
+        {/* form for adding a new EnquiryItem */}
         <div style={{backgroundColor: 'rgba(255,255,255,.6)', borderRadius: '4px', marginTop: '20px'}}>
-          <h3 style={{textAlign: 'center', 'fontWeight': 'lighter'}}>Add materials to quote #{row.object_number}</h3>
+          <h3 style={{textAlign: 'center', 'fontWeight': 'lighter'}}>Add materials to enquiry #{row.object_number}</h3>
           <div className="row">
             <div className="pageItem col-md-6">
               <label className="itemLabel">Material</label>
@@ -355,11 +352,11 @@ export class Quotes extends React.Component
 
                       this.unit_cost.value = selected_mat.resource_value;
 
-                      // create quote_item obj
-                      const quote_item =
+                      // create enquiry_item obj
+                      const enquiry_item =
                       {
                         item_number: row.resources.length,
-                        quote_id: row._id,
+                        enquiry_id: row._id,
                         resource_id: selected_mat._id,
                         unit_cost: selected_mat.resource_value,
                         quantity: 1,
@@ -368,7 +365,7 @@ export class Quotes extends React.Component
                       };
 
                       // update state
-                      this.setState({new_quote_item: quote_item});
+                      this.setState({new_enquiry_item: enquiry_item});
                     }}
                 />
               </div>
@@ -381,12 +378,12 @@ export class Quotes extends React.Component
                 ref={(unit_cost)=>this.unit_cost=unit_cost}
                 name="unit_cost"
                 type="text"
-                value={this.state.new_quote_item.unit_cost}
+                value={this.state.new_enquiry_item.unit_cost}
                 onChange={(new_val)=> {
-                    const quote_item = this.state.new_quote_item;
+                    const enquiry_item = this.state.new_enquiry_item;
                     
-                    quote_item.unit_cost = new_val.currentTarget.value;
-                    this.setState({new_quote_item: quote_item});
+                    enquiry_item.unit_cost = new_val.currentTarget.value;
+                    this.setState({new_enquiry_item: enquiry_item});
                   }}
                 style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
               />
@@ -399,12 +396,12 @@ export class Quotes extends React.Component
               <input
                 name="quantity"
                 type="number"
-                value={this.state.new_quote_item.quantity}
+                value={this.state.new_enquiry_item.quantity}
                 onChange={(new_val)=> {
-                    const quote_item = this.state.new_quote_item;
+                    const enquiry_item = this.state.new_enquiry_item;
                     
-                    quote_item.quantity = new_val.currentTarget.value;
-                    this.setState({new_quote_item: quote_item});
+                    enquiry_item.quantity = new_val.currentTarget.value;
+                    this.setState({new_enquiry_item: enquiry_item});
                   }}
                 style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
               />
@@ -416,7 +413,7 @@ export class Quotes extends React.Component
                 name="unit"
                 type="text"
                 disabled
-                value={this.state.new_quote_item.unit}
+                value={this.state.new_enquiry_item.unit}
                 style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
               />
             </div>
@@ -427,34 +424,34 @@ export class Quotes extends React.Component
               style={{width: '120px', height: '50px', float: 'left'}}
               onClick={() =>
               {
-                if(this.state.new_quote_item.resource_id && this.state.new_quote_item.quote_id)
+                if(this.state.new_enquiry_item.resource_id && this.state.new_enquiry_item.enquiry_id)
                 {
-                  const quote_item = this.state.new_quote_item;
-                  quote_item.date_logged = new Date().getTime()/1000; // epoch sec
-                  quote_item.creator = SessionManager.getSessionUser().usr;
-                  console.log('creating new quote item: ', quote_item);
+                  const enquiry_item = this.state.new_enquiry_item;
+                  enquiry_item.date_logged = new Date().getTime()/1000; // epoch sec
+                  enquiry_item.creator = SessionManager.getSessionUser().usr;
+                  console.log('creating new enquiry item: ', enquiry_item);
 
-                  row.resources.push(quote_item);
+                  row.resources.push(enquiry_item);
                   // update state
-                  this.setState({new_quote_item: quote_item});
-                  // signal add quote item
+                  this.setState({new_enquiry_item: enquiry_item});
+                  // signal add enquiry item
                   this.props.dispatch({
                     type: ACTION_TYPES.QUOTE_ITEM_ADD,
-                    payload: quote_item
+                    payload: enquiry_item
                   });
 
                   // TODO: fix this hack
-                  // signal update quote - so it saves to local storage
+                  // signal update enquiry - so it saves to local storage
                   this.props.dispatch({
                     type: ACTION_TYPES.QUOTE_UPDATE,
                     payload: row
                   });
-                  // this.setState(this.state.new_quote_item);
+                  // this.setState(this.state.new_enquiry_item);
                 } else
                   openDialog(
                   {
                     type: 'warning',
-                    title: 'Could not add material to quote',
+                    title: 'Could not add material to enquiry',
                     message: 'Please select a valid material from the drop down list',
                     buttons: [
                       'Yes',
@@ -473,18 +470,18 @@ export class Quotes extends React.Component
     return  (
       row.resources.length === 0 ? (
         <div>
-          { quote_options }
-          <Message danger text='Quote has no resources.' />
-          {/* form for adding a new QuoteItem */}
-          {new_quote_item_form}
+          { enquiry_options }
+          <Message danger text='Enquiry has no resources.' />
+          {/* form for adding a new EnquiryItem */}
+          {new_enquiry_item_form}
         </div>
       ) :
         <div style={{maxHeight: 'auto'}}>
-          { quote_options }
-          <h3 style={{textAlign: 'center', 'fontWeight': 'lighter'}}>List of materials for quote #{row.object_number}</h3>
+          { enquiry_options }
+          <h3 style={{textAlign: 'center', 'fontWeight': 'lighter'}}>List of materials for enquiry #{row.object_number}</h3>
           <BootstrapTable
-            id='tblQuoteResources'
-            key='tblQuoteResources'
+            id='tblEnquiryResources'
+            key='tblEnquiryResources'
             data={row.resources}
             striped
             hover
@@ -566,8 +563,8 @@ export class Quotes extends React.Component
             </TableHeaderColumn>
           </BootstrapTable>
 
-          {/* form for adding a new QuoteItem */}
-          {new_quote_item_form}
+          {/* form for adding a new EnquiryItem */}
+          {new_enquiry_item_form}
         </div>
     );
   }
@@ -604,7 +601,7 @@ export class Quotes extends React.Component
 
   openModal()
   {
-    this.setState({ is_new_quote_modal_open: true });
+    this.setState({ is_new_enquiry_modal_open: true });
   }
  
   afterOpenModal()
@@ -615,17 +612,17 @@ export class Quotes extends React.Component
  
   closeModal()
   {
-    this.setState({is_new_quote_modal_open: false});
+    this.setState({is_new_enquiry_modal_open: false});
   }
 
-  handleQuoteUpdate(evt, quote)
+  handleEnquiryUpdate(evt, enquiry)
   {
     if(evt.key === 'Enter')
     {
-      Log('verbose_info', 'updating quote: ' +  quote);
+      Log('verbose_info', 'updating enquiry: ' +  enquiry);
       this.props.dispatch({
         type: ACTION_TYPES.QUOTE_UPDATE,
-        payload: Object.assign(quote, { creator: SessionManager.getSessionUser().usr })
+        payload: Object.assign(enquiry, { creator: SessionManager.getSessionUser().usr })
       });
     }
   }
@@ -633,14 +630,14 @@ export class Quotes extends React.Component
   // Render
   render()
   {
-    const { quotes, t } = this.props;
+    const { enquiries, t } = this.props;
     
     const cellEditProp =
     {
       mode: 'click',
         // if product id less than 3, will cause the whole row noneditable
         // this function should return an array of row keys
-        // quotes.filter(q => q.id < 3).map(p => p.id)
+        // enquiries.filter(q => q.id < 3).map(p => p.id)
       nonEditableRows: () => ['_id', 'object_number', 'date_logged', 'creator', 'creator_name'],
       blurToSave: true,
       beforeSaveCell: this.onBeforeSaveCell, // a hook for before saving cell
@@ -660,15 +657,15 @@ export class Quotes extends React.Component
     return (
       <PageContent bare>
         <div style={{maxHeight: 'auto'}}>
-          {/* Quote Creation Modal */}
+          {/* Enquiry Creation Modal */}
           <Modal
-            isOpen={this.state.is_new_quote_modal_open}
+            isOpen={this.state.is_new_enquiry_modal_open}
             onAfterOpen={this.afterOpenModal}
             onRequestClose={this.closeModal}
             style={modalStyle}
-            contentLabel="New Quote Modal"
+            contentLabel="New Enquiry Modal"
           >
-            <h2 ref={subtitle => this.subtitle = subtitle} style={{color: 'black'}}>Create New Quote</h2>
+            <h2 ref={subtitle => this.subtitle = subtitle} style={{color: 'black'}}>Create New Enquiry</h2>
             <div>
               <div className="pageItem">
                 {/* <label className="itemLabel">{t('settings:fields:logo:name')}</label>
@@ -684,16 +681,16 @@ export class Quotes extends React.Component
                     <ComboBox
                       ref={(cbx_clients)=>this.cbx_clients = cbx_clients}
                       items={this.props.clients}
-                        // selected_item={this.state.new_quote.client}
+                        // selected_item={this.state.new_enquiry.client}
                       label='client_name'
                       onUpdate={(new_val)=>{
                           const selected_client = JSON.parse(new_val);
                           
-                          const quote = this.state.new_quote;
-                          quote.client_id = selected_client._id;
-                          quote.client = selected_client;
+                          const enquiry = this.state.new_enquiry;
+                          enquiry.client_id = selected_client._id;
+                          enquiry.client = selected_client;
 
-                          this.setState({new_quote: quote});
+                          this.setState({new_enquiry: enquiry});
                           this.sitename = selected_client.physical_address;
                         }}
                     />
@@ -706,15 +703,15 @@ export class Quotes extends React.Component
                     <ComboBox 
                       ref={(cbx_contacts)=>this.cbx_contacts = cbx_contacts}
                       items={this.props.users}
-                        // selected_item={this.state.new_quote.contact}
+                        // selected_item={this.state.new_enquiry.contact}
                       label='name'
                       onUpdate={(new_val)=>{
                           const selected_contact = JSON.parse(new_val);
-                          const quote = this.state.new_quote;
-                          quote.contact_id = selected_contact.usr;
-                          quote.contact = selected_contact;
+                          const enquiry = this.state.new_enquiry;
+                          enquiry.contact_id = selected_contact.usr;
+                          enquiry.contact = selected_contact;
 
-                          this.setState({new_quote: quote});
+                          this.setState({new_enquiry: enquiry});
                         }}
                     />
                   </div>
@@ -728,11 +725,11 @@ export class Quotes extends React.Component
                     ref={(txt_sitename)=>this.txt_sitename = txt_sitename}
                     name="sitename"
                     type="text"
-                    // value={this.state.new_quote.sitename}
+                    // value={this.state.new_enquiry.sitename}
                     onChange={(new_val)=>{
-                      const quote = this.state.new_quote;
-                      quote.sitename = new_val.currentTarget.value;
-                      this.setState({new_quote: quote});
+                      const enquiry = this.state.new_enquiry;
+                      enquiry.sitename = new_val.currentTarget.value;
+                      this.setState({new_enquiry: enquiry});
                     }}
                     style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
                   />
@@ -745,9 +742,9 @@ export class Quotes extends React.Component
                     type="text"
                     ref={(txt_request)=>this.txt_request = txt_request}
                     onChange={(new_val)=>{
-                      const quote = this.state.new_quote;
-                      quote.request = new_val.currentTarget.value;
-                      this.setState({new_quote: quote});
+                      const enquiry = this.state.new_enquiry;
+                      enquiry.request = new_val.currentTarget.value;
+                      this.setState({new_enquiry: enquiry});
                     }}
                     style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
                   />
@@ -756,19 +753,19 @@ export class Quotes extends React.Component
 
               <div className="row">
                 <div className="pageItem col-md-6">
-                  <label className="itemLabel">VAT [{this.state.new_quote.vat} %]</label>
+                  <label className="itemLabel">VAT [{this.state.new_enquiry.vat} %]</label>
                   <label className="switch">
                     <input
                       name="vat"
                       type="checkbox"
-                      checked={this.state.new_quote.vat>0}
+                      checked={this.state.new_enquiry.vat>0}
                       onChange={() =>
                         {
-                          const quote = this.state.new_quote;
-                          quote.vat = quote.vat > 0 ? 0 : GlobalConstants.VAT;
+                          const enquiry = this.state.new_enquiry;
+                          enquiry.vat = enquiry.vat > 0 ? 0 : GlobalConstants.VAT;
                           this.setState(
                           {
-                            new_quote: quote
+                            new_enquiry: enquiry
                           });
                         }}
                     />
@@ -780,7 +777,7 @@ export class Quotes extends React.Component
                   <label className="itemLabel">Notes</label>
                   <textarea
                     name="notes"
-                    value={this.state.new_quote.other}
+                    value={this.state.new_enquiry.other}
                     onChange={this.handleInputChange}
                     style={{width: '580px', border: '1px solid #2FA7FF', borderRadius: '3px'}}
                   />
@@ -796,9 +793,9 @@ export class Quotes extends React.Component
 
               <CustomButton
                 onClick={()=>{
-                  const quote = this.state.new_quote;
+                  const enquiry = this.state.new_enquiry;
 
-                  if(!quote.client)
+                  if(!enquiry.client)
                   {
                     return this.props.dispatch({
                       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
@@ -809,7 +806,7 @@ export class Quotes extends React.Component
                     });
                   }
 
-                  if(!quote.contact)
+                  if(!enquiry.contact)
                   {
                     return this.props.dispatch({
                       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
@@ -820,7 +817,7 @@ export class Quotes extends React.Component
                     });
                   }
 
-                  if(!quote.sitename)
+                  if(!enquiry.sitename)
                   {
                     return this.props.dispatch({
                             type: ACTION_TYPES.UI_NOTIFICATION_NEW,
@@ -831,7 +828,7 @@ export class Quotes extends React.Component
                           });
                   }
                   
-                  if(!quote.request)
+                  if(!enquiry.request)
                   {
                     return this.props.dispatch({
                       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
@@ -842,37 +839,37 @@ export class Quotes extends React.Component
                     });
                   }
 
-                  // Prepare Quote
-                  const client_name = quote.client.client_name.toString();
+                  // Prepare Enquiry
+                  const client_name = enquiry.client.client_name.toString();
 
-                  quote.object_number = this.props.quotes.length;
-                  quote.client_name = client_name;
-                  quote.client_id = quote.client._id;
-                  quote.contact_person = quote.contact.name;
-                  quote.contact_person_id = quote.contact.usr;
-                  quote.account_name = client_name.toLowerCase().replace(' ', '-');
-                  quote.creator_name = SessionManager.getSessionUser().name;
-                  quote.creator = SessionManager.getSessionUser().usr;
-                  quote.creator_user = SessionManager.getSessionUser();
-                  quote.date_logged = new Date().getTime()/1000;// current date in epoch SECONDS
+                  enquiry.object_number = this.props.enquiries.length;
+                  enquiry.client_name = client_name;
+                  enquiry.client_id = enquiry.client._id;
+                  enquiry.contact_person = enquiry.contact.name;
+                  enquiry.contact_person_id = enquiry.contact.usr;
+                  enquiry.account_name = client_name.toLowerCase().replace(' ', '-');
+                  enquiry.creator_name = SessionManager.getSessionUser().name;
+                  enquiry.creator = SessionManager.getSessionUser().usr;
+                  enquiry.creator_user = SessionManager.getSessionUser();
+                  enquiry.date_logged = new Date().getTime()/1000;// current date in epoch SECONDS
 
-                  this.setState({new_quote: quote, is_new_quote_modal_open: false});
+                  this.setState({new_enquiry: enquiry, is_new_enquiry_modal_open: false});
 
-                  this.props.quotes.push(this.state.new_quote);
+                  this.props.enquiries.push(this.state.new_enquiry);
                   mapStateToProps(this.state);
 
                   // this.props.dispatch({
                   //   type: ACTION_TYPES.UI_NOTIFICATION_NEW,
                   //   payload: {
                   //     type: 'success',
-                  //     message: 'Successfully created new quote',
+                  //     message: 'Successfully created new enquiry',
                   //   },
                   // });
 
-                  // dispatch action to create quote on local & remote stores
+                  // dispatch action to create enquiry on local & remote stores
                   this.props.dispatch({
                     type: ACTION_TYPES.QUOTE_NEW,
-                    payload: this.state.new_quote
+                    payload: this.state.new_enquiry
                   });
                   
                 }}
@@ -883,10 +880,10 @@ export class Quotes extends React.Component
             </div>
           </Modal>
 
-          {/* Quotes table & Column toggles */}
+          {/* Enquiries table & Column toggles */}
           <div style={{paddingTop: '0px'}}>
             
-            {/* Quotes Table column toggles */}
+            {/* Enquiries Table column toggles */}
             <Transition
               component={false}
               enter={{
@@ -910,10 +907,10 @@ export class Quotes extends React.Component
                   <Row>
                     {/* ID column toggle */}
                     <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Quote&nbsp;ID</label>
+                      <label className="itemLabel">Enquiry&nbsp;ID</label>
                       <label className="switch">
                         <input
-                          name="quoteID"
+                          name="enquiryID"
                           type="checkbox"
                           checked={this.state.col_id_visible}
                           onChange={() =>
@@ -933,10 +930,10 @@ export class Quotes extends React.Component
 
                     {/* Object # column toggle */}
                     <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Quote&nbsp;No.</label>
+                      <label className="itemLabel">Enquiry&nbsp;No.</label>
                       <label className="switch">
                         <input
-                          name="quoteNumber"
+                          name="enquiryNumber"
                           type="checkbox"
                           checked={this.state.col_object_number_visible}
                           onChange={() =>
@@ -1146,7 +1143,7 @@ export class Quotes extends React.Component
                     </Field>
                   </Row>
                   <Row>
-                    <CustomButton onClick={this.openModal} success>Create New Quote</CustomButton>
+                    <CustomButton onClick={this.openModal} success>Create New Enquiry</CustomButton>
                     <CustomButton
                       success
                       style={{marginLeft: '20px'}}
@@ -1165,16 +1162,15 @@ export class Quotes extends React.Component
               </div>
             </Transition>
 
-            {/* List of Quotes */}
-            {quotes.length === 0 ? (
-              <Message danger text='No quotes were found in the system' style={{marginTop: '145px'}} />
+            {/* List of Enquiries */}
+            {this.props.accommodationBookings.length === 0 ? (
+              <Message danger text='No enquiries were found in the system' style={{marginTop: '145px'}} />
             ) : (
               <div style={{maxHeight: 'auto', marginTop: '10px', backgroundColor: '#2BE8A2'}}>
-                {/* { getQuotesTable(quotes, this.state, this.props, this.getCaret, this.isExpandableRow, this.expandComponent, this.expandColumnComponent, cellEditProp, clientFormatter, options) } */}
                 <BootstrapTable
-                  id='tblQuotes'
-                  key='tblQuotes'
-                  data={quotes}
+                  id='tblAccommodationBookings'
+                  key='tblAccommodationBookings'
+                  data={enquiries}
                   striped
                   hover
                   insertRow={false}
@@ -1202,7 +1198,7 @@ export class Quotes extends React.Component
                     // thStyle={{position: 'fixed', left: '190px', background: 'lime'}}
                     tdStyle={{'fontWeight': 'lighter'}}
                     hidden={!this.state.col_id_visible}
-                  > Quote ID
+                  > Enquiry ID
                   </TableHeaderColumn>
 
                   <TableHeaderColumn
@@ -1215,7 +1211,7 @@ export class Quotes extends React.Component
                     // thStyle={{position: 'fixed', left: this.state.col_id_end + 'px', background: 'lime'}}
                     tdStyle={() => {({'fontWeight': 'lighter'})}}
                     hidden={!this.state.col_object_number_visible}
-                  > Quote Number
+                  > Enquiry Number
                   </TableHeaderColumn>
 
                   <TableHeaderColumn
@@ -1261,9 +1257,9 @@ export class Quotes extends React.Component
                           onChange={(val) => {
                             const sel_quo = props.row;
                             sel_quo.sitename = val.currentTarget.value;
-                            this.setState( { selected_quote: sel_quo })
+                            this.setState( { selected_enquiry: sel_quo })
                           }}
-                          onKeyPress={(evt) => this.handleQuoteUpdate(evt, props.row)}
+                          onKeyPress={(evt) => this.handleEnquiryUpdate(evt, props.row)}
                         />)
                     }}
                     hidden={!this.state.col_sitename_visible}
@@ -1284,9 +1280,9 @@ export class Quotes extends React.Component
                           onChange={(val) => {
                             const sel_quo = props.row;
                             sel_quo.request = val.currentTarget.value;
-                            this.setState( { selected_quote: sel_quo })
+                            this.setState( { selected_enquiry: sel_quo })
                           }}
-                          onKeyPress={(evt) => this.handleQuoteUpdate(evt, props.row)}
+                          onKeyPress={(evt) => this.handleEnquiryUpdate(evt, props.row)}
                         />)
                     }}
                     hidden={!this.state.col_request_visible}
@@ -1354,26 +1350,20 @@ export class Quotes extends React.Component
 }
 
 // PropTypes Validation
-Quotes.propTypes =
+Enquiries.propTypes =
 {
   dispatch: PropTypes.func.isRequired,
   // changeTab: PropTypes.func.isRequired,
-  users: PropTypes.arrayOf(PropTypes.object).isRequired,
-  materials: PropTypes.arrayOf(PropTypes.object).isRequired,
-  clients: PropTypes.arrayOf(PropTypes.object).isRequired,
-  quotes: PropTypes.arrayOf(PropTypes.object).isRequired
+  accommodationBookings: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
 // Map state to props & Export
 const mapStateToProps = state => (
 {
-  users: getUsers(state),
-  quotes: getQuotes(state),
-  clients: getClients(state),
-  materials: getMaterials(state)
+  accommodationBookings: getAccommodationBookings(state)
 });
 
 export default compose(
   connect(mapStateToProps),
   _withFadeInAnimation
-)(Quotes);
+)(Enquiries);

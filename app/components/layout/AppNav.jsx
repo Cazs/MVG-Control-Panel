@@ -23,34 +23,34 @@ const setMarginValue = activeTab =>
 const allTabs =
 [
   {
-    title: 'Enquiries',
-    name: 'enquiries',
-    icon: 'ion-clock', // ios-briefcase md-cog
+    title: 'Trip Bookings',
+    name: 'trip-bookings',
+    icon: 'ios-airplane',
   },
   {
-    title: 'Quotes',
-    name: 'quotes',
-    icon: 'ion-clipboard',
+    title: 'Accommodation Bookings',
+    name: 'accommodation-bookings',
+    icon: 'ios-bed',
   },
   {
-    title: 'Trips',
-    name: 'trips',
-    icon: 'ion-calculator',
+    title: 'Trip History',
+    name: 'trip-history',
+    icon: 'ios-car',
   },
   {
-    title: 'Invoices',
-    name: 'invoices',
-    icon: 'ion-ios-body',
+    title: 'Accommodation History',
+    name: 'accommodation-history',
+    icon: 'ios-briefcase',
   },
   {
     title: 'Messages',
     name: 'messages',
-    icon: 'ion-calendar',
+    icon: 'ios-chatbubbles',
   },
   {
     title: 'Settings',
     name: 'settings',
-    icon: 'ion-ios-gear',
+    icon: 'ios-cog',
   }
 ];
 
@@ -64,11 +64,11 @@ export const SideBar = styled.div`
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  width: 80px;
-  min-width: 80px;
-  max-width: 80px;
-  background: #2c323a;
-  margin-top: 43px;
+  width: 100px;
+  min-width: 100px;
+  max-width: 100px;
+  background: #363E47;
+  margin-top: 45px;
   -webkit-box-shadow: 7px 0px 17px #3c3c3c;
 `;
 
@@ -82,16 +82,17 @@ export const Tab = styled.a`
   font-size: 24px;
   line-height: 1.5;
   text-decoration: none;
-  height: 60px;
+  height: 90px;
   &:hover {
-    color: white;
+    color: #fff;
+    background: radial-gradient(circle 170px, #3c3c3c, #111417);
     text-decoration: none;
   }
 `;
 
 export const TabTitle = styled.div`
   position: absolute;
-  margin-top: 20px;
+  margin-top: 30px;
   font-size: 9pt;
   text-align:center;
   font-weight:100;
@@ -99,25 +100,38 @@ export const TabTitle = styled.div`
 `;
 
 export const Icon = styled.i`
-  ${props => props.id === 'enquiries' && `color: #40FF9A;`};
-  ${props => props.id === 'quotes' && `color: #469fe5;`};
-  ${props => props.id === 'trips' && `color: #C4C8CC;`};
-  ${props => props.id === 'invoices' && `color: #E84906;`};
+  ${props => props.id === 'trip-bookings' && `color: #40FF9A;`};
+  ${props => props.id === 'accommodation-bookings' && `color: #40FF9A;`};
+  ${props => props.id === 'trip-history' && `color: #469fe5;`};
+  ${props => props.id === 'accommodation-history' && `color: #C4C8CC;`};
   ${props => props.id === 'messages' && `color: #cbc189;`};
   ${props => props.id === 'settings' && `color: #cbc189;`};
 `;
 
 export const ActiveIndicator = styled.div`
-  height: ${allTabs.length * 60}px;
+  height: ${allTabs.length * 90}px;
   width: 5px;
   position: absolute;
   > div {
     position: absolute;
     background: #292b2c;
-    width: 80px;
+    width: 100px;
     border-left: 5px solid #469fe5;
     border-bottom: 1px solid #3e3e3e;
     border-top: 1px solid #3e3e3e;
+  }
+`;
+
+export const NavIcon = styled.div`
+  width: 60px;
+  height: 40px;
+  ${props => `background: url(../static/images/icons/${props.icon}.svg);`}
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  &:hover
+  {
+    // background-color: red;
   }
 `;
 
@@ -126,7 +140,8 @@ function AppNav({ activeTab, changeTab })
   const marginTopValue = setMarginValue(activeTab);
   const allTabsComponent = allTabs.map(tab => (
     <Tab key={tab.name} href="#" onClick={() => changeTab(tab.name)}>
-      <Icon id={tab.name} className={tab.icon} />
+      {/* <Icon id={tab.name} className={tab.icon} /> */}
+      <NavIcon id={tab.name} icon={tab.icon} />
       <TabTitle>{tab.title}</TabTitle>
     </Tab>
   ));

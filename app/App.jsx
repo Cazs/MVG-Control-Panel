@@ -13,7 +13,8 @@ import * as MaterialActions from './actions/materials';
 import * as QuoteActions from './actions/quotes';
 import * as TripActions from './actions/trips';
 import * as InvoiceActions from './actions/invoices';
-import * as EnquiryActions from './actions/enquiries';
+import * as TripBookingActions from './actions/trip_bookings';
+import * as AccommodationBookingsActions from './actions/accommodation_bookings';
 
 // Components
 import AppNav from './components/layout/AppNav';

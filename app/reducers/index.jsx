@@ -6,7 +6,8 @@ import SettingsReducer from './SettingsReducer';
 
 // Operational Reducers
 import UsersReducer from './UsersReducer';
-import EnquiriesReducer from './EnquiriesReducer';
+import AccommodationBookingsReducer from './AccommodationBookingsReducer';
+import TripsBookingsReducer from './TripBookingsReducer';
 import ClientsReducer from './ClientsReducer';
 import MaterialsReducer from './MaterialsReducer';
 import QuotesReducer from './QuotesReducer';
@@ -24,5 +25,6 @@ export default combineReducers(
   quotes: QuotesReducer,
   invoices: InvoicesReducer,
   trips: TripsReducer,
-  enquiries: EnquiriesReducer
+  accommodationBookings: AccommodationBookingsReducer,
+  tripBookings: TripsBookingsReducer
 });

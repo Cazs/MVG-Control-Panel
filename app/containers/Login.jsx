@@ -58,9 +58,7 @@ class Login extends Component
   {
     this.props.changeTab('signup');
   }
-
-
-
+  
   login()
   {
     this.props.setLoading(true);
@@ -179,6 +177,7 @@ class Login extends Component
                     ref={(txt_username)=>this.txt_username = txt_username}
                     name="username"
                     type="text"
+                    value='ghost'
                     style={{width: '100%', height: '35px', border: '1px solid #2FA7FF', borderRadius: '3px'}}
                     onKeyPress={(evt)=>
                     {
@@ -198,6 +197,7 @@ class Login extends Component
                     ref={(txt_password)=>this.txt_password = txt_password}
                     name="password"
                     type="password"
+                    value='12345678'
                     style={{width: '100%', height: '35px', border: '1px solid #2FA7FF', borderRadius: '3px'}}
                     onKeyPress={(evt)=>
                       {

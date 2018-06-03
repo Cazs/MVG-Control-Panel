@@ -23,10 +23,7 @@ import * as ACTION_TYPES from '../../constants/actions.jsx';
 import * as UIActions from '../../actions/ui';
 
 // Selectors
-import { getUsers } from '../../reducers/UsersReducer';
-import { getMaterials } from '../../reducers/MaterialsReducer';
-import { getClients } from '../../reducers/ClientsReducer';
-import { getEnquiries } from '../../reducers/EnquiriesReducer';
+import { getTripBookings } from '../../reducers/TripBookingsReducer';
 
 // Components
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
@@ -70,16 +67,16 @@ const modalStyle =
   }
 };
 
-export class Enquiries extends React.Component
+export class TripBookingsTabContent extends React.Component
 {
   constructor(props)
   {
     super(props);
     
-    this.editEnquiry = this.editEnquiry.bind(this);
-    this.deleteEnquiry = this.deleteEnquiry.bind(this);
-    this.duplicateEnquiry = this.duplicateEnquiry.bind(this);
-    this.setEnquiryStatus = this.setEnquiryStatus.bind(this);
+    this.editBooking = this.editBooking.bind(this);
+    this.deleteBooking = this.deleteBooking.bind(this);
+    this.duplicateBooking = this.duplicateBooking.bind(this);
+    this.setBookingStatus = this.setBookingStatus.bind(this);
     this.expandComponent = this.expandComponent.bind(this);
     
     // this.creator_ref = React.createRef();
@@ -89,26 +86,11 @@ export class Enquiries extends React.Component
 
     this.col_toggles_container = null;
     this.col_width = 235;
-    this.state = {  filter: null,
-                    is_new_enquiry_modal_open: false,
-                    is_enquiry_items_modal_open: false,
-                    selected_enquiry: null,
-                    active_row: null,
-                    column_toggles_top: -200,
-                    // Table Column Toggles
-                    col_id_visible: false,
-                    col_object_number_visible: true,
-                    col_client_id_visible: true,
-                    col_contact_person_id_visible: false,
-                    col_sitename_visible: false,
-                    col_request_visible: true,
-                    col_vat_visible: false,
-                    col_revision_visible: false,
-                    col_status_visible: true,
-                    col_creator_visible: false,
-                    col_date_logged_visible: false,
-                    // Enquiry to be created
-                    new_enquiry:
+    this.state = {
+                    is_new_booking_modal_open: false,
+                    selected_booking: null,
+                    // Booking to be created
+                    new_booking:
                     {
                       client_id: null,
                       client: null,
@@ -120,28 +102,19 @@ export class Enquiries extends React.Component
                       vat: GlobalConstants.VAT,
                       status: 0,
                       resources: []
-                    },
-                    // Enquiry Item to be added
-                    new_enquiry_item:
-                    {
-                      resource_id: null,
-                      unit_cost: 0,
-                      quantity: 1,
-                      markup: 0,
-                      additional_costs: ''
                     }
     };
   }
 
-  // Load Enquiries & add event listeners
+  // Load TripBookingsTabContent & add event listeners
   componentDidMount()
   {
     // Add Event Listener
-    ipc.on('confirmed-delete-enquiry', (event, index, enquiryId) =>
+    ipc.on('confirmed-delete-booking', (event, index, bookingId) =>
     {
       if (index === 0)
       {
-        this.confirmedDeleteEnquiry(enquiryId);
+        this.confirmedDeleteBooking(bookingId);
       }
     });
   }
@@ -149,11 +122,11 @@ export class Enquiries extends React.Component
   // Remove all IPC listeners when unmounted
   componentWillUnmount()
   {
-    ipc.removeAllListeners('confirmed-delete-enquiry');
+    ipc.removeAllListeners('confirmed-delete-booking');
   }
 
   // Open Confirm Dialog
-  deleteEnquiry(enquiryId)
+  deleteBooking(bookingId)
   {
     openDialog(
       {
@@ -165,467 +138,40 @@ export class Enquiries extends React.Component
           'No'
         ],
       },
-      'confirmed-delete-enquiry',
-      enquiryId
+      'confirmed-delete-booking',
+      bookingId
     );
   }
 
-  showEnquiryPreview(enquiry)
+  showBookingPreview(booking)
   {
     // Preview Window
-    ipc.send('preview-enquiry', enquiry);
+    ipc.send('preview-booking', booking);
   }
 
-  // Confirm Delete an enquiry
-  confirmedDeleteEnquiry(enquiryId)
+  // Confirm Delete an booking
+  confirmedDeleteBooking(bookingId)
   {
     const { dispatch } = this.props;
-    // dispatch(Actions.deleteEnquiry(enquiryId));
+    // dispatch(Actions.deleteBooking(bookingId));
   }
 
-  // set the enquiry status
-  setEnquiryStatus(enquiryId, status)
+  // set the booking status
+  setBookingStatus(bookingId, status)
   {
     alert('set status to: ' + status);
     const { dispatch } = this.props;
-    // dispatch(Actions.setEnquiryStatus(enquiryId, status));
+    // dispatch(Actions.setBookingStatus(bookingId, status));
   }
 
-  editEnquiry(enquiry)
-  {
-    const { dispatch } = this.props;
-    // dispatch(Actions.editEnquiry(enquiry));
-  }
-
-  duplicateEnquiry(enquiry)
-  {
-    const { dispatch } = this.props;
-    // dispatch(Actions.duplicateEnquiry(enquiry));
-  }
-
-  setFilter(event)
-  {
-    const currentFilter = this.state.filter;
-    const newFilter = event.target.dataset.filter;
-    this.setState({ filter: currentFilter === newFilter ? null : newFilter });
-  }
-
-  getCaret(direction)
-  {
-    if (direction === 'asc')
-    {
-      return (
-        <img src="../static/open-iconic-master/svg/caret-top.svg" alt='up' />
-      );
-    }
-    if (direction === 'desc') {
-      return (
-        <img src="../static/open-iconic-master/svg/caret-bottom.svg" alt='down' />
-      );
-    }
-    return (
-      <span>
-        <img src="../static/open-iconic-master/svg/info.svg" alt='info' style={{width: '13px', height: '13px', marginLeft: '10px'}} />
-        (click&nbsp;to&nbsp;sort)
-      </span>
-    );
-  }
-
-  onAfterSaveCell(row, cellName, cellValue)
-  {
-    // alert(`After cell save ${cellName} with value ${cellValue}`);
-  
-    // let rowStr = '';
-    /* for (const prop in row) {
-      rowStr += prop + ': ' + row[prop] + '\n';
-    } */
-  
-    // alert('Thw whole row :\n' + rowStr);
-  }
-  
-  onBeforeSaveCell(row, cellName, cellValue)
-  {
-    // alert(`Before cell save ${cellName} with value ${cellValue}`);
-    // You can do any validation on here for editing value,
-    // return false for reject the editing
-    return true;
-  }
-
-  isExpandableRow(row)
-  {
-    // (row.object_number < 50) ? return true : return false;
-    return true;
-  }
-
-  expandComponent(row)
-  {
-    const cellEditProp =
-    {
-      mode: 'click',
-        // if product id less than 3, will cause the whole row noneditable
-        // this function should return an array of row keys
-        // enquiries.filter(q => q.id < 3).map(p => p.id)
-      nonEditableRows: () => ['_id', 'object_number'],
-      blurToSave: true
-      // beforeSaveCell: {},// this.onBeforeSaveCell, // a hook for before saving cell
-      // afterSaveCell: {}// this.onAfterSaveCell  // a hook for after saving cell
-    };
-
-    const options =
-    {
-      defaultSortName: 'item_number',  // default sort column name
-      defaultSortOrder: 'asc'
-    };
-
-    const enquiry_options = (
-      <div>
-        <CustomButton primary onClick={() => this.showEnquiryPreview(row)}>PDF Preview</CustomButton>
-        <CustomButton
-          primary
-          style={{marginLeft: '15px'}}
-          onClick={(evt) =>
-          {
-            // if(!row.status == 0)
-            // {
-            //   return this.props.dispatch({
-            //     type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-            //     payload: {
-            //       type: 'danger',
-            //       message: 'Error: Enquiry has not yet been approved',
-            //     },
-            //   });
-            // }
-
-            // Prepare Trip
-            const new_trip =
-            {
-              // object_number = this.props.enquiries.length,
-              enquiry_id: row._id,
-              enquiry: row,
-              client_name: row.client_name,
-              client: row.client,
-              contact_person: row.contact_person,
-              contact: row.contact,
-              request: row.request,
-              sitename: row.sitename,
-              vat: row.vat,
-              creator_name: SessionManager.session_usr.name,
-              status: 0,
-              enquiry_revisions: row.revision,
-              tasks: [],
-              creator: SessionManager.session_usr.usr,
-              creator_user: SessionManager.session_usr,
-              date_logged: new Date().getTime()/1000 // current date in epoch SECONDS
-            }
-
-            // this.props.trips.push(new_trip);
-
-            // ipc.send(evt, 'change-operations-tab', 2);
-
-            // dispatch action to create trip on local & remote stores
-            this.props.dispatch({
-              type: ACTION_TYPES.TRIP_NEW,
-              payload: new_trip
-            });
-
-            // this.props.changeTab(2);
-          }}
-        >Create&nbsp;New&nbsp;Trip
-        </CustomButton>
-      </div>
-    );
-
-    const new_enquiry_item_form = (
-      <div>
-        {/* form for adding a new EnquiryItem */}
-        <div style={{backgroundColor: 'rgba(255,255,255,.6)', borderRadius: '4px', marginTop: '20px'}}>
-          <h3 style={{textAlign: 'center', 'fontWeight': 'lighter'}}>Add materials to enquiry #{row.object_number}</h3>
-          <div className="row">
-            <div className="pageItem col-md-6">
-              <label className="itemLabel">Material</label>
-              <div>
-                <ComboBox
-                  items={this.props.materials}
-                  label='resource_description'
-                    // defaultValue={this.props.materials[0]}
-                  onUpdate={(newValue) =>
-                    {
-                      // get selected value
-                      const selected_mat = JSON.parse(newValue);
-
-                      this.unit_cost.value = selected_mat.resource_value;
-
-                      // create enquiry_item obj
-                      const enquiry_item =
-                      {
-                        item_number: row.resources.length,
-                        enquiry_id: row._id,
-                        resource_id: selected_mat._id,
-                        unit_cost: selected_mat.resource_value,
-                        quantity: 1,
-                        unit: selected_mat.unit,
-                        item_description: selected_mat.resource_description
-                      };
-
-                      // update state
-                      this.setState({new_enquiry_item: enquiry_item});
-                    }}
-                />
-              </div>
-            </div>
-
-            <div className="pageItem col-md-6">
-              <label className="itemLabel">Unit Cost</label>
-              <input
-                id="unit_cost"
-                ref={(unit_cost)=>this.unit_cost=unit_cost}
-                name="unit_cost"
-                type="text"
-                value={this.state.new_enquiry_item.unit_cost}
-                onChange={(new_val)=> {
-                    const enquiry_item = this.state.new_enquiry_item;
-                    
-                    enquiry_item.unit_cost = new_val.currentTarget.value;
-                    this.setState({new_enquiry_item: enquiry_item});
-                  }}
-                style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-              />
-            </div>
-          </div>
-
-          <div className="row">
-            <div className="pageItem col-md-6">
-              <label className="itemLabel">Quantity</label>
-              <input
-                name="quantity"
-                type="number"
-                value={this.state.new_enquiry_item.quantity}
-                onChange={(new_val)=> {
-                    const enquiry_item = this.state.new_enquiry_item;
-                    
-                    enquiry_item.quantity = new_val.currentTarget.value;
-                    this.setState({new_enquiry_item: enquiry_item});
-                  }}
-                style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-              />
-            </div>
-
-            <div className="pageItem col-md-6">
-              <label className="itemLabel">Unit</label>
-              <input
-                name="unit"
-                type="text"
-                disabled
-                value={this.state.new_enquiry_item.unit}
-                style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-              />
-            </div>
-          </div>
-          <div style={{width: '300px', marginLeft: 'auto', marginRight: 'auto', marginTop: '15px'}}>
-            <CustomButton
-              success
-              style={{width: '120px', height: '50px', float: 'left'}}
-              onClick={() =>
-              {
-                if(this.state.new_enquiry_item.resource_id && this.state.new_enquiry_item.enquiry_id)
-                {
-                  const enquiry_item = this.state.new_enquiry_item;
-                  enquiry_item.date_logged = new Date().getTime()/1000; // epoch sec
-                  enquiry_item.creator = SessionManager.session_usr.usr;
-                  console.log('creating new enquiry item: ', enquiry_item);
-
-                  row.resources.push(enquiry_item);
-                  // update state
-                  this.setState({new_enquiry_item: enquiry_item});
-                  // signal add enquiry item
-                  this.props.dispatch({
-                    type: ACTION_TYPES.QUOTE_ITEM_ADD,
-                    payload: enquiry_item
-                  });
-
-                  // TODO: fix this hack
-                  // signal update enquiry - so it saves to local storage
-                  this.props.dispatch({
-                    type: ACTION_TYPES.QUOTE_UPDATE,
-                    payload: row
-                  });
-                  // this.setState(this.state.new_enquiry_item);
-                } else
-                  openDialog(
-                  {
-                    type: 'warning',
-                    title: 'Could not add material to enquiry',
-                    message: 'Please select a valid material from the drop down list',
-                    buttons: [
-                      'Yes',
-                      'No'
-                    ]
-                  })
-              }}
-            >Add
-            </CustomButton>
-            <CustomButton style={{width: '120px', height: '50px', float: 'left', marginLeft: '15px'}} danger>Reset Fields</CustomButton>
-          </div>
-        </div> 
-      </div>
-    );
-    // console.log('-<><><><><>:-< ', row.resources)
-    return  (
-      row.resources.length === 0 ? (
-        <div>
-          { enquiry_options }
-          <Message danger text='Enquiry has no resources.' />
-          {/* form for adding a new EnquiryItem */}
-          {new_enquiry_item_form}
-        </div>
-      ) :
-        <div style={{maxHeight: 'auto'}}>
-          { enquiry_options }
-          <h3 style={{textAlign: 'center', 'fontWeight': 'lighter'}}>List of materials for enquiry #{row.object_number}</h3>
-          <BootstrapTable
-            id='tblEnquiryResources'
-            key='tblEnquiryResources'
-            data={row.resources}
-            striped
-            hover
-            insertRow={false}
-            cellEdit={cellEditProp}
-            options={options}
-            // onScroll={}
-            version='4' // bootstrap version
-          >
-            <TableHeaderColumn
-              dataField='item_number'
-              dataSort
-              caretRender={this.getCaret}
-              tdStyle={{'fontWeight': 'lighter', whiteSpace: 'normal'}}
-              thStyle={{ whiteSpace: 'normal' }}
-              // hidden={!this.state.col_object_number_visible}
-            > Item Number
-            </TableHeaderColumn>
-
-            <TableHeaderColumn
-              isKey
-              dataField='item_description'
-              dataSort
-              caretRender={this.getCaret}
-              tdStyle={{'fontWeight': 'lighter', whiteSpace: 'normal'}}
-              thStyle={{ whiteSpace: 'normal' }}
-              // hidden={!this.state.col_object_number_visible}
-            > Item Description
-            </TableHeaderColumn>
-
-            <TableHeaderColumn
-              dataField='unit_cost'
-              dataSort
-              caretRender={this.getCaret}
-              tdStyle={{'fontWeight': 'lighter', whiteSpace: 'normal'}}
-              thStyle={{ whiteSpace: 'normal' }}
-              // hidden={!this.state.col_client_id_visible}
-            > Unit Cost
-            </TableHeaderColumn>
-
-            <TableHeaderColumn
-              dataField='quantity'
-              dataSort
-              caretRender={this.getCaret}
-              tdStyle={{'fontWeight': 'lighter', whiteSpace: 'normal'}}
-              thStyle={{ whiteSpace: 'normal' }}
-              // hidden={!this.state.col_contact_person_id_visible}
-            > Quantity
-            </TableHeaderColumn>
-            
-            <TableHeaderColumn
-              dataField='unit'
-              dataSort
-              caretRender={this.getCaret}
-              tdStyle={{'fontWeight': 'lighter', whiteSpace: 'normal'}}
-              thStyle={{ whiteSpace: 'normal' }}
-              // hidden={!this.state.col_sitename_visible}
-            >  Measurement/Unit
-            </TableHeaderColumn>
-
-            <TableHeaderColumn
-              dataField='additional_costs'
-              dataSort
-              caretRender={this.getCaret}
-              tdStyle={{'fontWeight': 'lighter', whiteSpace: 'normal'}}
-              thStyle={{ whiteSpace: 'normal' }}
-              // hidden={!this.state.col_request_visible}
-            > Extra Costs
-            </TableHeaderColumn>
-
-            <TableHeaderColumn
-              dataField='other'
-              dataSort
-              caretRender={this.getCaret}
-              tdStyle={{'fontWeight': 'lighter', whiteSpace: 'normal'}}
-              thStyle={{ whiteSpace: 'normal' }}
-              hidden
-            > Notes
-            </TableHeaderColumn>
-          </BootstrapTable>
-
-          {/* form for adding a new EnquiryItem */}
-          {new_enquiry_item_form}
-        </div>
-    );
-  }
-
-  expandColumnComponent({ isExpandableRow, isExpanded })
-  {
-    if (isExpandableRow)
-    {
-      if(isExpanded)
-        return (<span className="ion-arrow-down-b" />);
-      return (<span className="ion-arrow-right-b" />);
-    } 
-    return(<span />);
-  }
-
-  toggleColumnVisibility()
-  {
-    // alert(this.getState().col_id_visible);
-    // let cur = 0;
-    let id_end = 190;
-    if(this.state.col_id_visible)
-    {
-      id_end += this.col_width;
-    }
-    // alert('id col ends at ' + id_end)
-    // cur += this.state.col_id_end;
-
-    this.setState(
-    {
-      col_id_end: id_end,// this.state.col_id_visible ? 190 + this.col_width : 190,
-      col_object_number_end: this.state.col_object_number_visible ? this.state.col_id_end + this.col_width : this.state.col_id_end
-    });
-  }
-
-  openModal()
-  {
-    this.setState({ is_new_enquiry_modal_open: true });
-  }
- 
-  afterOpenModal()
-  {
-    // references are now sync'd and can be accessed.
-    this.subtitle.style.color = '#2FA7FF';
-  }
- 
-  closeModal()
-  {
-    this.setState({is_new_enquiry_modal_open: false});
-  }
-
-  handleEnquiryUpdate(evt, enquiry)
+  handleBookingUpdate(evt, booking)
   {
     if(evt.key === 'Enter')
     {
-      Log('verbose_info', 'updating enquiry: ' +  enquiry);
+      Log('verbose_info', 'updating booking: ' +  booking);
       this.props.dispatch({
         type: ACTION_TYPES.QUOTE_UPDATE,
-        payload: Object.assign(enquiry, { creator: SessionManager.session_usr.usr })
+        payload: Object.assign(booking, { creator: SessionManager.getSessionUser().usr })
       });
     }
   }
@@ -634,41 +180,21 @@ export class Enquiries extends React.Component
   render()
   {
     const { enquiries, t } = this.props;
-    
-    const cellEditProp =
-    {
-      mode: 'click',
-        // if product id less than 3, will cause the whole row noneditable
-        // this function should return an array of row keys
-        // enquiries.filter(q => q.id < 3).map(p => p.id)
-      nonEditableRows: () => ['_id', 'object_number', 'date_logged', 'creator', 'creator_name'],
-      blurToSave: true,
-      beforeSaveCell: this.onBeforeSaveCell, // a hook for before saving cell
-      afterSaveCell: this.onAfterSaveCell  // a hook for after saving cell
-    };
 
-    const options =
-    {
-      defaultSortName: 'object_number',  // default sort column name
-      defaultSortOrder: 'desc',
-      expandRowBgColor: 'rgba(0, 0, 0, .4)',
-    };
-
-    // const clientFormatter = (cell, row) => (<div>test</div>);
     const clientFormatter = (cell, row) => `<i class='glyphicon glyphicon-${cell.client_name}'></i> ${cell.client_name}`;
 
     return (
       <PageContent bare>
         <div style={{maxHeight: 'auto'}}>
-          {/* Enquiry Creation Modal */}
+          {/* Booking Creation Modal */}
           <Modal
-            isOpen={this.state.is_new_enquiry_modal_open}
+            isOpen={this.state.is_new_booking_modal_open}
             onAfterOpen={this.afterOpenModal}
             onRequestClose={this.closeModal}
             style={modalStyle}
-            contentLabel="New Enquiry Modal"
+            contentLabel="New Booking Modal"
           >
-            <h2 ref={subtitle => this.subtitle = subtitle} style={{color: 'black'}}>Create New Enquiry</h2>
+            <h2 ref={subtitle => this.subtitle = subtitle} style={{color: 'black'}}>Create New Booking</h2>
             <div>
               <div className="pageItem">
                 {/* <label className="itemLabel">{t('settings:fields:logo:name')}</label>
@@ -684,16 +210,16 @@ export class Enquiries extends React.Component
                     <ComboBox
                       ref={(cbx_clients)=>this.cbx_clients = cbx_clients}
                       items={this.props.clients}
-                        // selected_item={this.state.new_enquiry.client}
+                        // selected_item={this.state.new_booking.client}
                       label='client_name'
                       onUpdate={(new_val)=>{
                           const selected_client = JSON.parse(new_val);
                           
-                          const enquiry = this.state.new_enquiry;
-                          enquiry.client_id = selected_client._id;
-                          enquiry.client = selected_client;
+                          const booking = this.state.new_booking;
+                          booking.client_id = selected_client._id;
+                          booking.client = selected_client;
 
-                          this.setState({new_enquiry: enquiry});
+                          this.setState({new_booking: booking});
                           this.sitename = selected_client.physical_address;
                         }}
                     />
@@ -706,15 +232,15 @@ export class Enquiries extends React.Component
                     <ComboBox 
                       ref={(cbx_contacts)=>this.cbx_contacts = cbx_contacts}
                       items={this.props.users}
-                        // selected_item={this.state.new_enquiry.contact}
+                        // selected_item={this.state.new_booking.contact}
                       label='name'
                       onUpdate={(new_val)=>{
                           const selected_contact = JSON.parse(new_val);
-                          const enquiry = this.state.new_enquiry;
-                          enquiry.contact_id = selected_contact.usr;
-                          enquiry.contact = selected_contact;
+                          const booking = this.state.new_booking;
+                          booking.contact_id = selected_contact.usr;
+                          booking.contact = selected_contact;
 
-                          this.setState({new_enquiry: enquiry});
+                          this.setState({new_booking: booking});
                         }}
                     />
                   </div>
@@ -728,11 +254,11 @@ export class Enquiries extends React.Component
                     ref={(txt_sitename)=>this.txt_sitename = txt_sitename}
                     name="sitename"
                     type="text"
-                    // value={this.state.new_enquiry.sitename}
+                    // value={this.state.new_booking.sitename}
                     onChange={(new_val)=>{
-                      const enquiry = this.state.new_enquiry;
-                      enquiry.sitename = new_val.currentTarget.value;
-                      this.setState({new_enquiry: enquiry});
+                      const booking = this.state.new_booking;
+                      booking.sitename = new_val.currentTarget.value;
+                      this.setState({new_booking: booking});
                     }}
                     style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
                   />
@@ -745,9 +271,9 @@ export class Enquiries extends React.Component
                     type="text"
                     ref={(txt_request)=>this.txt_request = txt_request}
                     onChange={(new_val)=>{
-                      const enquiry = this.state.new_enquiry;
-                      enquiry.request = new_val.currentTarget.value;
-                      this.setState({new_enquiry: enquiry});
+                      const booking = this.state.new_booking;
+                      booking.request = new_val.currentTarget.value;
+                      this.setState({new_booking: booking});
                     }}
                     style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
                   />
@@ -756,19 +282,19 @@ export class Enquiries extends React.Component
 
               <div className="row">
                 <div className="pageItem col-md-6">
-                  <label className="itemLabel">VAT [{this.state.new_enquiry.vat} %]</label>
+                  <label className="itemLabel">VAT [{this.state.new_booking.vat} %]</label>
                   <label className="switch">
                     <input
                       name="vat"
                       type="checkbox"
-                      checked={this.state.new_enquiry.vat>0}
+                      checked={this.state.new_booking.vat>0}
                       onChange={() =>
                         {
-                          const enquiry = this.state.new_enquiry;
-                          enquiry.vat = enquiry.vat > 0 ? 0 : GlobalConstants.VAT;
+                          const booking = this.state.new_booking;
+                          booking.vat = booking.vat > 0 ? 0 : GlobalConstants.VAT;
                           this.setState(
                           {
-                            new_enquiry: enquiry
+                            new_booking: booking
                           });
                         }}
                     />
@@ -780,7 +306,7 @@ export class Enquiries extends React.Component
                   <label className="itemLabel">Notes</label>
                   <textarea
                     name="notes"
-                    value={this.state.new_enquiry.other}
+                    value={this.state.new_booking.other}
                     onChange={this.handleInputChange}
                     style={{width: '580px', border: '1px solid #2FA7FF', borderRadius: '3px'}}
                   />
@@ -796,9 +322,9 @@ export class Enquiries extends React.Component
 
               <CustomButton
                 onClick={()=>{
-                  const enquiry = this.state.new_enquiry;
+                  const booking = this.state.new_booking;
 
-                  if(!enquiry.client)
+                  if(!booking.client)
                   {
                     return this.props.dispatch({
                       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
@@ -809,7 +335,7 @@ export class Enquiries extends React.Component
                     });
                   }
 
-                  if(!enquiry.contact)
+                  if(!booking.contact)
                   {
                     return this.props.dispatch({
                       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
@@ -820,7 +346,7 @@ export class Enquiries extends React.Component
                     });
                   }
 
-                  if(!enquiry.sitename)
+                  if(!booking.sitename)
                   {
                     return this.props.dispatch({
                             type: ACTION_TYPES.UI_NOTIFICATION_NEW,
@@ -831,7 +357,7 @@ export class Enquiries extends React.Component
                           });
                   }
                   
-                  if(!enquiry.request)
+                  if(!booking.request)
                   {
                     return this.props.dispatch({
                       type: ACTION_TYPES.UI_NOTIFICATION_NEW,
@@ -842,37 +368,37 @@ export class Enquiries extends React.Component
                     });
                   }
 
-                  // Prepare Enquiry
-                  const client_name = enquiry.client.client_name.toString();
+                  // Prepare Booking
+                  const client_name = booking.client.client_name.toString();
 
-                  enquiry.object_number = this.props.enquiries.length;
-                  enquiry.client_name = client_name;
-                  enquiry.client_id = enquiry.client._id;
-                  enquiry.contact_person = enquiry.contact.name;
-                  enquiry.contact_person_id = enquiry.contact.usr;
-                  enquiry.account_name = client_name.toLowerCase().replace(' ', '-');
-                  enquiry.creator_name = SessionManager.session_usr.name;
-                  enquiry.creator = SessionManager.session_usr.usr;
-                  enquiry.creator_user = SessionManager.session_usr;
-                  enquiry.date_logged = new Date().getTime()/1000;// current date in epoch SECONDS
+                  booking.object_number = this.props.enquiries.length;
+                  booking.client_name = client_name;
+                  booking.client_id = booking.client._id;
+                  booking.contact_person = booking.contact.name;
+                  booking.contact_person_id = booking.contact.usr;
+                  booking.account_name = client_name.toLowerCase().replace(' ', '-');
+                  booking.creator_name = SessionManager.getSessionUser().name;
+                  booking.creator = SessionManager.getSessionUser().usr;
+                  booking.creator_user = SessionManager.getSessionUser();
+                  booking.date_logged = new Date().getTime()/1000;// current date in epoch SECONDS
 
-                  this.setState({new_enquiry: enquiry, is_new_enquiry_modal_open: false});
+                  this.setState({new_booking: booking, is_new_booking_modal_open: false});
 
-                  this.props.enquiries.push(this.state.new_enquiry);
+                  this.props.enquiries.push(this.state.new_booking);
                   mapStateToProps(this.state);
 
                   // this.props.dispatch({
                   //   type: ACTION_TYPES.UI_NOTIFICATION_NEW,
                   //   payload: {
                   //     type: 'success',
-                  //     message: 'Successfully created new enquiry',
+                  //     message: 'Successfully created new booking',
                   //   },
                   // });
 
-                  // dispatch action to create enquiry on local & remote stores
+                  // dispatch action to create booking on local & remote stores
                   this.props.dispatch({
                     type: ACTION_TYPES.QUOTE_NEW,
-                    payload: this.state.new_enquiry
+                    payload: this.state.new_booking
                   });
                   
                 }}
@@ -883,10 +409,10 @@ export class Enquiries extends React.Component
             </div>
           </Modal>
 
-          {/* Enquiries table & Column toggles */}
+          {/* TripBookingsTabContent table & Column toggles */}
           <div style={{paddingTop: '0px'}}>
             
-            {/* Enquiries Table column toggles */}
+            {/* TripBookingsTabContent Table column toggles */}
             <Transition
               component={false}
               enter={{
@@ -910,10 +436,10 @@ export class Enquiries extends React.Component
                   <Row>
                     {/* ID column toggle */}
                     <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Enquiry&nbsp;ID</label>
+                      <label className="itemLabel">Booking&nbsp;ID</label>
                       <label className="switch">
                         <input
-                          name="enquiryID"
+                          name="bookingID"
                           type="checkbox"
                           checked={this.state.col_id_visible}
                           onChange={() =>
@@ -933,10 +459,10 @@ export class Enquiries extends React.Component
 
                     {/* Object # column toggle */}
                     <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Enquiry&nbsp;No.</label>
+                      <label className="itemLabel">Booking&nbsp;No.</label>
                       <label className="switch">
                         <input
-                          name="enquiryNumber"
+                          name="bookingNumber"
                           type="checkbox"
                           checked={this.state.col_object_number_visible}
                           onChange={() =>
@@ -1146,7 +672,7 @@ export class Enquiries extends React.Component
                     </Field>
                   </Row>
                   <Row>
-                    <CustomButton onClick={this.openModal} success>Create New Enquiry</CustomButton>
+                    <CustomButton onClick={this.openModal} success>Create New Booking</CustomButton>
                     <CustomButton
                       success
                       style={{marginLeft: '20px'}}
@@ -1165,15 +691,14 @@ export class Enquiries extends React.Component
               </div>
             </Transition>
 
-            {/* List of Enquiries */}
-            {enquiries.length === 0 ? (
+            {/* List of Trip Bookings */}
+            {this.props.tripBookings.length === 0 ? (
               <Message danger text='No enquiries were found in the system' style={{marginTop: '145px'}} />
             ) : (
               <div style={{maxHeight: 'auto', marginTop: '10px', backgroundColor: '#2BE8A2'}}>
-                {/* { getEnquiriesTable(enquiries, this.state, this.props, this.getCaret, this.isExpandableRow, this.expandComponent, this.expandColumnComponent, cellEditProp, clientFormatter, options) } */}
                 <BootstrapTable
-                  id='tblEnquiries'
-                  key='tblEnquiries'
+                  id='tblTripBookingsTabContent'
+                  key='tblTripBookingsTabContent'
                   data={enquiries}
                   striped
                   hover
@@ -1202,7 +727,7 @@ export class Enquiries extends React.Component
                     // thStyle={{position: 'fixed', left: '190px', background: 'lime'}}
                     tdStyle={{'fontWeight': 'lighter'}}
                     hidden={!this.state.col_id_visible}
-                  > Enquiry ID
+                  > Booking ID
                   </TableHeaderColumn>
 
                   <TableHeaderColumn
@@ -1215,7 +740,7 @@ export class Enquiries extends React.Component
                     // thStyle={{position: 'fixed', left: this.state.col_id_end + 'px', background: 'lime'}}
                     tdStyle={() => {({'fontWeight': 'lighter'})}}
                     hidden={!this.state.col_object_number_visible}
-                  > Enquiry Number
+                  > Booking Number
                   </TableHeaderColumn>
 
                   <TableHeaderColumn
@@ -1261,9 +786,9 @@ export class Enquiries extends React.Component
                           onChange={(val) => {
                             const sel_quo = props.row;
                             sel_quo.sitename = val.currentTarget.value;
-                            this.setState( { selected_enquiry: sel_quo })
+                            this.setState( { selected_booking: sel_quo })
                           }}
-                          onKeyPress={(evt) => this.handleEnquiryUpdate(evt, props.row)}
+                          onKeyPress={(evt) => this.handleBookingUpdate(evt, props.row)}
                         />)
                     }}
                     hidden={!this.state.col_sitename_visible}
@@ -1284,9 +809,9 @@ export class Enquiries extends React.Component
                           onChange={(val) => {
                             const sel_quo = props.row;
                             sel_quo.request = val.currentTarget.value;
-                            this.setState( { selected_enquiry: sel_quo })
+                            this.setState( { selected_booking: sel_quo })
                           }}
-                          onKeyPress={(evt) => this.handleEnquiryUpdate(evt, props.row)}
+                          onKeyPress={(evt) => this.handleBookingUpdate(evt, props.row)}
                         />)
                     }}
                     hidden={!this.state.col_request_visible}
@@ -1354,26 +879,20 @@ export class Enquiries extends React.Component
 }
 
 // PropTypes Validation
-Enquiries.propTypes =
+TripBookingsTabContent.propTypes =
 {
   dispatch: PropTypes.func.isRequired,
   // changeTab: PropTypes.func.isRequired,
-  users: PropTypes.arrayOf(PropTypes.object).isRequired,
-  materials: PropTypes.arrayOf(PropTypes.object).isRequired,
-  clients: PropTypes.arrayOf(PropTypes.object).isRequired,
-  enquiries: PropTypes.arrayOf(PropTypes.object).isRequired
+  tripBookings: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
 // Map state to props & Export
 const mapStateToProps = state => (
 {
-  users: getUsers(state),
-  enquiries: getEnquiries(state),
-  clients: getClients(state),
-  materials: getMaterials(state)
+  tripBookings: getTripBookings(state)
 });
 
 export default compose(
   connect(mapStateToProps),
   _withFadeInAnimation
-)(Enquiries);
+)(TripBookingsTabContent);
