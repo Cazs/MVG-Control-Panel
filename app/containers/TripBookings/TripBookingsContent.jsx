@@ -45,6 +45,7 @@ import styled from 'styled-components';
 import * as SessionManager from '../../helpers/SessionManager';
 import Log from '../../helpers/Logger';
 import { trip_types } from './Form'; 
+import { trip_booking_statuses } from '../../helpers/statuses'; 
 
 import
   {
@@ -181,7 +182,8 @@ export class TripBookingsTabContent extends React.Component
                       style={{
                         width: '84%',
                         marginTop: '10px',
-                        backgroundColor: '#12648A',
+                        backgroundColor: 'rgba(0, 0, 0, .5)',
+                        minHeight: '480px',
                         borderRadius: '10px',
                         padding: '6px',
                         border: '2px solid #3c3c3c'
@@ -391,10 +393,40 @@ export class TripBookingsTabContent extends React.Component
                           </tr>
                           <tr>
                             <td><p>Date Logged:</p></td>
-                            <td><p>{tripBooking.logged_date}</p></td>
+                            <td><p style={{color: '#fff'}}>{tripBooking.logged_date}</p></td>
+                          </tr>
+                          <tr>
+                            <td><p>Status:</p></td>
+                            <td><p style={{color: tripBooking.status == 3 ? 'red' : tripBooking.status == 1 || tripBooking.status == 2 ? 'lime' : '#fff'}}>{trip_booking_statuses[tripBooking.status].status_description}</p></td>
                           </tr>
                         </tbody>
                       </table>
+                      <button
+                        className='btn btn-success'
+                        style={{width: '150px', height: '70px', float: 'left'}}
+                        onClick={(event)=>
+                        {
+                          this.props.setLoading(true);
+                          tripBooking.status = trip_booking_statuses[1].status;
+                          this.handleBookingUpdate(tripBooking);
+                          this.setState({}); // TODO: update GUI from callback
+                        }}
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        className='btn btn-danger'
+                        style={{width: '120px', height: '50px', float: 'right'}}
+                        onClick={(event)=>
+                        {
+                          this.props.setLoading(true);
+                          tripBooking.status = trip_booking_statuses[3].status;
+                          this.handleBookingUpdate(tripBooking);
+                          this.setState({}); // TODO: update GUI from callback
+                        }}
+                      >
+                        Cancel
+                      </button>
                     </div>
                   </div>))
               )}
