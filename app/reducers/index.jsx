@@ -4,27 +4,22 @@ import { combineReducers } from 'redux';
 import UIReducer from './UIReducer';
 import SettingsReducer from './SettingsReducer';
 
-// Operational Reducers
+// Business Logic Reducers
 import UsersReducer from './UsersReducer';
-import AccommodationBookingsReducer from './AccommodationBookingsReducer';
-import TripsBookingsReducer from './TripBookingsReducer';
 import ClientsReducer from './ClientsReducer';
 import MaterialsReducer from './MaterialsReducer';
-import QuotesReducer from './QuotesReducer';
-import TripsReducer from './TripsReducer';
-import InvoicesReducer from './InvoicesReducer';
+import TripsBookingsReducer from './TripBookingsReducer';
+import AccommodationBookingsReducer from './AccommodationBookingsReducer';
 
 export default combineReducers(
 {
+  // Generic Reducers
   ui: UIReducer,
   settings: SettingsReducer,
-
+  // Business Logic Reducers
   users: UsersReducer,
   materials: MaterialsReducer,
   clients: ClientsReducer,
-  quotes: QuotesReducer,
-  invoices: InvoicesReducer,
-  trips: TripsReducer,
   accommodationBookings: AccommodationBookingsReducer,
   tripBookings: TripsBookingsReducer
 });

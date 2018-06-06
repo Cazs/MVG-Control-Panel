@@ -13,31 +13,34 @@ class ComboBox extends React.Component
         };
     }
     
-    focus() {
-      this.inputRef.focus();
-    }
     updateData(value) {
       // this.props.onUpdate({ selected_item: this.state.selected_item });
       this.props.onUpdate(value);
     }
+
     render() {
       return (
         <span>
           <select
-            value={this.state.selected_item}
+            defaultValue={this.props.value ? this.props.value : ' '}
             onKeyDown={this.props.onKeyDown}
             onChange={(ev) =>
                       {
-                        this.setState({ selected_item: ev.currentTarget.value });
-                        // console.log(ev.currentTarget);
+                        console.log('ComboBox> selected: ', ev.currentTarget.value);
                         this.updateData(ev.currentTarget.value);
                       }}
           >
             {
               this.props.items ? 
-              this.props.items.map(item =>
-                (<option key={item._id} value={JSON.stringify(item)}>{ item[this.props.label] }</option>)) :
-              (<option />)
+                this.props.items.map(item =>
+                  (<option
+                      key={item._id}
+                      value={item[this.props.label]}
+                      // selected={this.props.value ? item[this.props.label] === this.props.value : false}
+                    >
+                      { item[this.props.label] }
+                    </option>)
+                  ) : (<option />)
             }
           </select>
         </span>
@@ -48,7 +51,7 @@ class ComboBox extends React.Component
   ComboBox.propTypes =
   {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
-    // selected_item: PropTypes.object.isRequired,
+    // value: PropTypes.object.isRequired,
     label: PropTypes.string.isRequired
   };
 

@@ -16,12 +16,10 @@ import MeasureMW from '../middlewares/MeasureMW';
 // Business Logic Related Middleware i.e. glorified event listeners
 
 import UsersMW from '../middlewares/UsersMW';
-import QuotesMW from '../middlewares/QuotesMW';
 import ClientsMW from '../middlewares/ClientsMW';
 import MaterialsMW from '../middlewares/MaterialsMW';
-import TripsMW from '../middlewares/TripsMW';
-import InvoicesMW from '../middlewares/InvoicesMW';
-import EnquiriesMW from '../middlewares/EnquiriesMW';
+import TripBookingsMW from '../middlewares/TripBookingsMW';
+import AccommodationBookingsMW from '../middlewares/AccommodationBookingsMW';
 
 const middlewares = 
 [
@@ -30,12 +28,10 @@ const middlewares =
   UIMiddleware,
   /* Business Logic Related Middleware */
   UsersMW,
-  EnquiriesMW,
   ClientsMW,
   MaterialsMW,
-  QuotesMW,
-  TripsMW,
-  InvoicesMW
+  TripBookingsMW,
+  AccommodationBookingsMW
 ];
 
 // Dev Mode Middlewares

@@ -7,14 +7,11 @@ const ipc = require('electron').ipcRenderer;
 /* Actions */
 import * as UIActions from './actions/ui';
 import * as SettingsActions from './actions/settings';
-import * as UserActions from './actions/users';
+/* import * as UserActions from './actions/users';
 import * as ClientActions from './actions/clients';
 import * as MaterialActions from './actions/materials';
-import * as QuoteActions from './actions/quotes';
-import * as TripActions from './actions/trips';
-import * as InvoiceActions from './actions/invoices';
 import * as TripBookingActions from './actions/trip_bookings';
-import * as AccommodationBookingsActions from './actions/accommodation_bookings';
+import * as AccommodationBookingsActions from './actions/accommodation_bookings';*/
 
 // Components
 import AppNav from './components/layout/AppNav';
@@ -23,7 +20,6 @@ import AppNotification from './components/layout/AppNotification';
 // import AppUpdate from './components/layout/AppUpdate';
 import { AppWrapper } from './components/shared/Layout';
 import { BootstrapTable, TableHeaderColumn } from 'react-bootstrap-table';
-import ComboBox from './components/shared/ComboBox';
 
 // Components
 class App extends PureComponent
@@ -49,17 +45,6 @@ class App extends PureComponent
   {
     const { dispatch } = this.props;
     dispatch(SettingsActions.getInitalSettings());
-    
-    // Get User data
-    dispatch(UserActions.getUsers());
-
-    // Get Operational data
-    // dispatch(EnquiryActions.getEnquiries());
-    // dispatch(ClientActions.getClients());
-    // dispatch(MaterialActions.getMaterials());
-    // dispatch(QuoteActions.getQuotes());
-    // dispatch(TripActions.getTrips());
-    // dispatch(InvoiceActions.getInvoices());
     
     this.changeTab('login');
     // Add Event Listener

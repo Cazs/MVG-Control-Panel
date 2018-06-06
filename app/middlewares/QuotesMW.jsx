@@ -26,7 +26,7 @@ const QuotesMW = ({ dispatch, getState }) => next => action =>
     {
       const new_quote = Object.assign(action.payload, {object_number: getState().quotes.length});
       // Save to remote store then local store
-      return DataManager.putRemoteResource(dispatch, DataManager.db_quotes, new_quote, '/quote', 'quotes')
+      return DataManager.put(dispatch, DataManager.db_quotes, new_quote, '/quote', 'quotes')
                         .then(response => 
                           {
                             next(action);
@@ -37,14 +37,14 @@ const QuotesMW = ({ dispatch, getState }) => next => action =>
     case ACTION_TYPES.QUOTE_UPDATE:
     {
       console.log('quote update:', action.payload);
-      return DataManager.postRemoteResource(dispatch, DataManager.db_quotes, action.payload, '/quote', 'quotes')
+      return DataManager.post(dispatch, DataManager.db_quotes, action.payload, '/quote', 'quotes')
                         .then(response => next({ type: ACTION_TYPES.QUOTE_UPDATE, payload: response }));
     }
 
     case ACTION_TYPES.QUOTE_ITEM_ADD:
     {
       console.log('quote item add:', action.payload);
-      return DataManager.putRemoteResource(dispatch, null, action.payload, '/quote/resource', 'quote_resources')
+      return DataManager.put(dispatch, null, action.payload, '/quote/resource', 'quote_resources')
                         .then(response => next({ type: ACTION_TYPES.QUOTE_ITEM_ADD, payload: response }));
     }
 

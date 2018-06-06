@@ -26,7 +26,7 @@ const InvoicesMW = ({ dispatch, getState }) => next => action =>
     {
       const new_invoice = Object.assign(action.payload, {object_number: getState().invoices.length});
       // Save to remote store then local store
-      return DataManager.putRemoteResource(dispatch, DataManager.db_invoices, new_invoice, '/invoice', 'invoices')
+      return DataManager.put(dispatch, DataManager.db_invoices, new_invoice, '/invoice', 'invoices')
                         .then(response => 
                           {
                             next(action);

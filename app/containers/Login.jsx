@@ -22,11 +22,9 @@ import Log from '../helpers/Logger';
 // Ops
 import * as UserActions from '../actions/users';
 import * as ClientActions from '../actions/clients';
-import * as SupplierActions from '../actions/suppliers';
 import * as MaterialActions from '../actions/materials';
-import * as QuoteActions from '../actions/quotes';
-import * as TripActions from '../actions/trips';
-import * as InvoiceActions from '../actions/invoices';
+import * as TripBookingActions from '../actions/trip_bookings';
+import * as AccommodationBookingActions from '../actions/accommodation_bookings';
 
 import
 {
@@ -64,7 +62,6 @@ class Login extends Component
     this.props.setLoading(true);
     console.log('authenticating %s:%s', this.txt_username.value, this.txt_password.value);
 
-    // TODO: bcrypt
     // Send auth request
     DataManager.authenticate(this.props.dispatch, {username: this.txt_username.value, password: this.txt_password.value})
     .then(session_data =>
@@ -116,11 +113,9 @@ class Login extends Component
     // Get data
     dispatch(UserActions.getUsers());
     dispatch(ClientActions.getClients());
-    dispatch(SupplierActions.getSuppliers());
     dispatch(MaterialActions.getMaterials());
-    dispatch(QuoteActions.getQuotes());
-    dispatch(TripActions.getTrips());
-    dispatch(InvoiceActions.getInvoices());
+    dispatch(TripBookingActions.getTripBookings());
+    dispatch(AccommodationBookingActions.getAccommodationBookings());
   }
 
   // Render Main Content

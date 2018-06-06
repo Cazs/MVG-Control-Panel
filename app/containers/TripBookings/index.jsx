@@ -11,6 +11,7 @@ import { getMaterials } from '../../reducers/MaterialsReducer';
 import { getClients } from '../../reducers/ClientsReducer';
 
 // Components
+import TripBookingsContent from './TripBookingsContent';
 import { Field, Part, Row } from '../../components/shared/Part';
 import Button from '../../components/shared/Button';
 import { Tab, Tabs, TabContent } from '../../components/shared/Tabs';
@@ -24,10 +25,9 @@ import
 } from '../../components/shared/Layout';
 import _withFadeInAnimation from '../../components/shared/hoc/_withFadeInAnimation';
 
-// Tab content Components
-import TripBookingsContent from './TripBookingsContent';
+// Actions
+import * as TripBookingActions from '../../actions/trip_bookings';
 
-// Component
 class Bookings extends Component
 {
   constructor(props)
@@ -37,10 +37,9 @@ class Bookings extends Component
     this.header_actions = React.createRef();
   }
 
-  // Switch Tab
-  changeTab(tabNum)
+  componentDidMount()
   {
-    this.setState({ visibleTab: tabNum });
+    this.props.dispatch(TripBookingActions.getTripBookings());
   }
 
   // Render Main Content
@@ -60,7 +59,7 @@ class Bookings extends Component
           </PageHeaderActions>
         </PageHeader>
         <PageContent>
-          <TripBookingsContent />
+          <TripBookingsContent setLoading={this.props.setLoading}/>
         </PageContent>
       </PageWrapper>
     );

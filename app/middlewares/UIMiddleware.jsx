@@ -19,7 +19,6 @@ const UIMiddleware = ({ getState }) => next => action =>
     // New Notification
     case ACTION_TYPES.UI_NOTIFICATION_NEW:
     {
-      console.log('>>>>', action);
       if(action.payload.type !== undefined)
       {
         // Play a sound based on notification type

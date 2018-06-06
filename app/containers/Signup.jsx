@@ -110,9 +110,9 @@ class Signup extends Component
     this.state.new_user.name = this.state.new_user.firstname + ' ' + this.state.new_user.lastname;
     this.state.new_user.initials = this.state.new_user.firstname.charAt(0) + this.state.new_user.lastname.charAt(0);
     this.state.new_user.active = false;
-    // TODO: bcrypt
+    
     // Send signup request
-    DataManager.putRemoteResource(this.props.dispatch, DataManager.db_users, this.state.new_user, '/user', 'users')
+    DataManager.put(this.props.dispatch, DataManager.db_users, this.state.new_user, '/user', 'users')
     .then(res =>
     {
       console.log('response data: ' + res);

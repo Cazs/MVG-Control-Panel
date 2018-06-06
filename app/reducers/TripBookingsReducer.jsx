@@ -6,8 +6,6 @@ const TripBookingsReducer = handleActions(
   {
     [combineActions(
       Actions.getTripBookings,
-      Actions.saveTripBooking,
-      Actions.saveTripBookingConfigs,
       Actions.updateTripBooking,
       Actions.deleteTripBooking,
       Actions.setTripBookingStatus

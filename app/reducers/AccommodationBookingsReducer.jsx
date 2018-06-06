@@ -6,8 +6,6 @@ const AccommodationBookingsReducer = handleActions(
   {
     [combineActions(
       Actions.getAccommodationBookings,
-      Actions.saveAccommodationBooking,
-      Actions.saveAccommodationBookingConfigs,
       Actions.updateAccommodationBooking,
       Actions.deleteAccommodationBooking,
       Actions.setAccommodationBookingStatus

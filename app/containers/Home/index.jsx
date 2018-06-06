@@ -11,7 +11,6 @@ import Slider from '../../components/slideshow/Slider';
 
 // Actions
 import * as ACTION_TYPES from '../../constants/actions.jsx';
-import * as UIActions from '../../actions/ui';
 import { TripBookingForm } from '../TripBookings/Form';
 import { AccommodationBookingForm } from '../AccommodationBookings/Form';
 
@@ -57,8 +56,8 @@ class Home extends Component
   constructor(props)
   {
     super(props);
-    this.setTripBookingFormVisibility = this.setTripBookingFormVisibility.bind(this);
-    this.setAccommodationBookingFormVisibility = this.setAccommodationBookingFormVisibility.bind(this);
+    this.setTripBookingFormVisible = this.setTripBookingFormVisible.bind(this);
+    this.setAccommodationBookingFormVisible = this.setAccommodationBookingFormVisible.bind(this);
 
     this.state =
     {
@@ -69,7 +68,7 @@ class Home extends Component
     };
   }
 
-  setTripBookingFormVisibility(val)
+  setTripBookingFormVisible(val)
   {
     this.setState(
       {
@@ -78,7 +77,7 @@ class Home extends Component
       });
   }
 
-  setAccommodationBookingFormVisibility(val)
+  setAccommodationBookingFormVisible(val)
   {
     this.setState(
       {
@@ -173,14 +172,18 @@ class Home extends Component
 
             <TripBookingForm 
               style={{margin: '0px 0px 0px 0px'}}
-              setTripBookingFormVisibility={()=>this.setTripBookingFormVisibility}
+              setTripBookingFormVisible={this.setTripBookingFormVisible}
               popover_visible={this.state.trip_booking_popover_visible}
+              setLoading={this.props.setLoading}
+              dispatch={this.props.dispatch}
             />
 
             <AccommodationBookingForm 
               style={{margin: '0px 0px 0px 0px'}}
-              setAccommodationBookingFormVisibility={()=>this.setAccommodationBookingFormVisibility}
+              setAccommodationBookingFormVisible={this.setAccommodationBookingFormVisible}
               popover_visible={this.state.accommodation_booking_popover_visible}
+              setLoading={this.props.setLoading}
+              dispatch={this.props.dispatch}
             />
             
             <Button
@@ -188,7 +191,7 @@ class Home extends Component
               style={{width: '140px', height: '60px'}}
               onClick={()=>
                 {
-                  this.setTripBookingFormVisibility(!this.state.trip_booking_popover_visible);
+                  this.setTripBookingFormVisible(!this.state.trip_booking_popover_visible);
                 }}
             >
               Transport
@@ -201,7 +204,7 @@ class Home extends Component
               ref={(btn)=>this.btnAccommodation = btn}
               onClick={(evt)=>
               {
-                this.setAccommodationBookingFormVisibility(!this.state.accommodation_booking_popover_visible);
+                this.setAccommodationBookingFormVisible(!this.state.accommodation_booking_popover_visible);
               }}
             >
               Accommodation

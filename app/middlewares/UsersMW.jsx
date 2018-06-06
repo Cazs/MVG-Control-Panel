@@ -29,7 +29,7 @@ const UsersMW = ({ dispatch, getState }) => next => action =>
     {
       const new_user = Object.assign(action.payload, {object_number: getState().users.length});
       // Save to remote store then local store
-      return DataManager.putRemoteResource(dispatch, DataManager.db_users, new_user, '/user', 'users')
+      return DataManager.put(dispatch, DataManager.db_users, new_user, '/user', 'users')
                         .then(response =>
                         {
                           const user = Object.assign(action.payload, {_id: response}); // w/ _id
@@ -44,7 +44,7 @@ const UsersMW = ({ dispatch, getState }) => next => action =>
     case ACTION_TYPES.USER_UPDATE:
     {
       console.log('user update:', action.payload);
-      return DataManager.postRemoteResource(dispatch, DataManager.db_users, action.payload, '/user', 'users')
+      return DataManager.post(dispatch, DataManager.db_users, action.payload, '/user', 'users')
                         .then(response =>
                           next({ type: ACTION_TYPES.USER_UPDATE, payload: response }))
                         .catch(err =>

@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 
 const openDialog = require('../../renderers/dialog.js');
 const ipc = require('electron').ipcRenderer;
+import { formatDate } from '../../helpers/DateFormatter';
 
 import Option from 'muicss/lib/react/option';
 import Select from 'muicss/lib/react/select';
@@ -43,6 +44,7 @@ import styled from 'styled-components';
 // Helpers
 import * as SessionManager from '../../helpers/SessionManager';
 import Log from '../../helpers/Logger';
+import { trip_types } from './Form'; 
 
 import
   {
@@ -73,36 +75,14 @@ export class TripBookingsTabContent extends React.Component
   {
     super(props);
     
-    this.editBooking = this.editBooking.bind(this);
+    /*this.editBooking = this.editBooking.bind(this);
     this.deleteBooking = this.deleteBooking.bind(this);
     this.duplicateBooking = this.duplicateBooking.bind(this);
-    this.setBookingStatus = this.setBookingStatus.bind(this);
-    this.expandComponent = this.expandComponent.bind(this);
-    
-    // this.creator_ref = React.createRef();
-    this.openModal = this.openModal.bind(this);
-    this.afterOpenModal = this.afterOpenModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-
-    this.col_toggles_container = null;
-    this.col_width = 235;
-    this.state = {
-                    is_new_booking_modal_open: false,
-                    selected_booking: null,
-                    // Booking to be created
-                    new_booking:
-                    {
-                      client_id: null,
-                      client: null,
-                      contact_id: null,
-                      contact: null,
-                      request: null,
-                      sitename: null,
-                      notes: null,
-                      vat: GlobalConstants.VAT,
-                      status: 0,
-                      resources: []
-                    }
+    this.setBookingStatus = this.setBookingStatus.bind(this);*/
+    this.date_scheduled_picker = React.createRef();
+    this.state = 
+    {
+      column_toggles_top: -200
     };
   }
 
@@ -164,714 +144,261 @@ export class TripBookingsTabContent extends React.Component
     // dispatch(Actions.setBookingStatus(bookingId, status));
   }
 
-  handleBookingUpdate(evt, booking)
+  handleBookingUpdate(booking)
   {
-    if(evt.key === 'Enter')
-    {
-      Log('verbose_info', 'updating booking: ' +  booking);
-      this.props.dispatch({
-        type: ACTION_TYPES.QUOTE_UPDATE,
-        payload: Object.assign(booking, { creator: SessionManager.getSessionUser().usr })
-      });
-    }
+    const {dispatch, setLoading} = this.props;
+    // if(event.key === 'Enter')
+    Log('verbose_info', 'updating booking: ' +  booking);
+    dispatch({
+      type: ACTION_TYPES.TRIP_BOOKING_UPDATE,
+      payload: booking,
+      callback(server_response, error)
+      {
+        setLoading(false);
+        if(server_response)
+          dispatch(UIActions.newNotification('success', 'Successfully updated trip booking.'));
+        else dispatch(UIActions.newNotification('danger', 'Could NOT successfully update trip booking:\n ' + error));
+      }
+    });
   }
 
   // Render
   render()
   {
-    const { enquiries, t } = this.props;
-
-    const clientFormatter = (cell, row) => `<i class='glyphicon glyphicon-${cell.client_name}'></i> ${cell.client_name}`;
+    const { tripBookings } = this.props;
 
     return (
       <PageContent bare>
         <div style={{maxHeight: 'auto'}}>
-          {/* Booking Creation Modal */}
-          <Modal
-            isOpen={this.state.is_new_booking_modal_open}
-            onAfterOpen={this.afterOpenModal}
-            onRequestClose={this.closeModal}
-            style={modalStyle}
-            contentLabel="New Booking Modal"
-          >
-            <h2 ref={subtitle => this.subtitle = subtitle} style={{color: 'black'}}>Create New Booking</h2>
-            <div>
-              <div className="pageItem">
-                {/* <label className="itemLabel">{t('settings:fields:logo:name')}</label>
-                  <Logo
-                    logo={this.state.logo}
-                    handleLogoChange={this.handleLogoChange}
-                  /> */}
-              </div>
-              <div className="row">
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">Company</label>
-                  <div>
-                    <ComboBox
-                      ref={(cbx_clients)=>this.cbx_clients = cbx_clients}
-                      items={this.props.clients}
-                        // selected_item={this.state.new_booking.client}
-                      label='client_name'
-                      onUpdate={(new_val)=>{
-                          const selected_client = JSON.parse(new_val);
-                          
-                          const booking = this.state.new_booking;
-                          booking.client_id = selected_client._id;
-                          booking.client = selected_client;
+            <h2 style={{textAlign: 'center'}}>List of trip bookings</h2>
+            <div className='row'>
+              {this.props.tripBookings.length === 0 ? (
+                <Message danger text='No bookings were found in the system' style={{marginTop: '145px'}} />
+              ) : (
+                tripBookings.map((tripBooking)=>
+                  (<div className='col-lg-6 col-md-12'>
+                    <div
+                      style={{
+                        width: '84%',
+                        marginTop: '10px',
+                        backgroundColor: '#12648A',
+                        borderRadius: '10px',
+                        padding: '6px',
+                        border: '2px solid #3c3c3c'
+                      }}>
+                      <table>
+                        <tbody>
+                          <tr>
+                            <td><p>From:</p></td>
+                            <td>
+                              <input
+                                type='text'
+                                value={tripBooking.pickup_location}
+                                onChange={(event) =>
+                                  {
+                                    tripBooking.pickup_location = event.currentTarget.value;
+                                    console.log('pickup_location: ', event.currentTarget.value);
+                                    this.setState({}); // TODO: update GUI from callback
+                                  }}
+                                onKeyPress={(event) =>
+                                {
+                                  if(event.key == 'Enter')
+                                  {
+                                    this.props.setLoading(true);
+                                    // update UI
+                                    this.handleBookingUpdate(tripBooking);
+                                  }  
+                                }}
+                              />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><p>To:</p></td>
+                            <td>
+                              <input
+                                type='text'
+                                value={tripBooking.destination}
+                                onChange={(event) =>
+                                  {
+                                    tripBooking.destination = event.currentTarget.value;
+                                    console.log('destination: ', event.currentTarget.value);
+                                    this.setState({}); // TODO: update GUI from callback
+                                  }}
+                                onKeyPress={(event) =>
+                                {
+                                  if(event.key == 'Enter')
+                                  {
+                                    this.props.setLoading(true);
+                                    // update UI
+                                    this.handleBookingUpdate(tripBooking);
+                                  }  
+                                }}
+                              />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><p>Trip Type:</p></td>
+                            <td>
+                              <ComboBox
+                                items={trip_types}
+                                label='type_name'
+                                value={tripBooking.trip_type}
+                                onUpdate={(newValue) =>
+                                    {
+                                      console.log('selected trip type: ', newValue);
 
-                          this.setState({new_booking: booking});
-                          this.sitename = selected_client.physical_address;
-                        }}
-                    />
-                  </div>
-                </div>
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel"> Contact </label>
-                  {/* TODO: common:fields:email? */}
-                  <div>
-                    <ComboBox 
-                      ref={(cbx_contacts)=>this.cbx_contacts = cbx_contacts}
-                      items={this.props.users}
-                        // selected_item={this.state.new_booking.contact}
-                      label='name'
-                      onUpdate={(new_val)=>{
-                          const selected_contact = JSON.parse(new_val);
-                          const booking = this.state.new_booking;
-                          booking.contact_id = selected_contact.usr;
-                          booking.contact = selected_contact;
+                                      this.props.setLoading(true);
+                                      tripBooking.trip_type = newValue;
+                                      // update UI
+                                      this.setState({}); // TODO: update GUI from callback
+                                      this.handleBookingUpdate(tripBooking);
+                                    }}
+                            />
+                            </td>
+                            
+                          </tr>
+                          <tr>
+                            <td><p>Date Scheduled:</p></td>
+                            <td>
+                              <input
+                                ref={(date_scheduled_picker)=>this[tripBooking._id] = date_scheduled_picker}
+                                type='date'
+                                defaultValue={formatDate(new Date(tripBooking.date_scheduled))}
+                                onChange={(event) =>
+                                  {
+                                    this.props.setLoading(true);
 
-                          this.setState({new_booking: booking});
-                        }}
-                    />
-                  </div>
-                </div>
-              </div>
+                                    console.log('new scheduled date str: ', event.currentTarget.value);
+                                    if(!event.currentTarget.value)
+                                    {
+                                      this.props.setLoading(false);
+                                      return console.log('Error: Invalid date. Scheduled date has to be in the future.');
+                                    }
+                                    const new_date = new Date(event.currentTarget.value);
+                                    console.log('new scheduled date: ', new_date);
+                                    // date picker counts months from 1, Date object counts months from 0, account for that
+                                    const derived_date = new Date(new_date.getFullYear(), new_date.getMonth() + 1, new_date.getDate());
+                                    console.log('formatted scheduled date: ', formatDate(derived_date));
 
-              <div className="row">
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">Sitename</label>
-                  <input
-                    ref={(txt_sitename)=>this.txt_sitename = txt_sitename}
-                    name="sitename"
-                    type="text"
-                    // value={this.state.new_booking.sitename}
-                    onChange={(new_val)=>{
-                      const booking = this.state.new_booking;
-                      booking.sitename = new_val.currentTarget.value;
-                      this.setState({new_booking: booking});
-                    }}
-                    style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-                  />
-                </div>
+                                    if(new_date.getTime() <= new Date().getTime())
+                                    {
+                                      this.props.setLoading(false);
+                                      return this.props.dispatch(UIActions.newNotification('danger', 'Error: date has to be in the future.'));
+                                    }
 
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">Request</label>
-                  <input
-                    name="request"
-                    type="text"
-                    ref={(txt_request)=>this.txt_request = txt_request}
-                    onChange={(new_val)=>{
-                      const booking = this.state.new_booking;
-                      booking.request = new_val.currentTarget.value;
-                      this.setState({new_booking: booking});
-                    }}
-                    style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-                  />
-                </div>
-              </div>
+                                    // if is return trip, make sure that scheduled date is <= return date
+                                    if(tripBooking.trip_type == trip_types[1].type_name && derived_date.getTime() > new Date(tripBooking.return_date).getTime())
+                                    {
+                                      this.props.setLoading(false);
+                                      return this.props.dispatch(UIActions.newNotification('danger', 'Error: Scheduled date cannot be after the return date.'));
+                                    }
+                                    
+                                    tripBooking.date_scheduled = derived_date.getTime();
+                                    this[tripBooking._id].value = formatDate(derived_date);
+                                    // update UI
+                                    this.setState({}); // TODO: update GUI from callback
 
-              <div className="row">
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">VAT [{this.state.new_booking.vat} %]</label>
-                  <label className="switch">
-                    <input
-                      name="vat"
-                      type="checkbox"
-                      checked={this.state.new_booking.vat>0}
-                      onChange={() =>
-                        {
-                          const booking = this.state.new_booking;
-                          booking.vat = booking.vat > 0 ? 0 : GlobalConstants.VAT;
-                          this.setState(
-                          {
-                            new_booking: booking
-                          });
-                        }}
-                    />
-                    <span className="slider round" />
-                  </label>
-                </div>
+                                    this.handleBookingUpdate(tripBooking);
+                                  }}
+                              />
+                            </td>
+                          </tr>
+                          <tr hidden={tripBooking.trip_type == trip_types[0].type_name}>
+                            <td><p>Return Date:</p></td>
+                            <td>
+                              <input
+                                ref={(return_date_picker)=>this[tripBooking._id] = return_date_picker}
+                                type='date'
+                                defaultValue={formatDate(new Date(tripBooking.return_date))}
+                                onChange={(event) =>
+                                  {
+                                    console.log('new return date str: ', event.currentTarget.value);
+                                    if(!event.currentTarget.value)
+                                    {
+                                      this.props.setLoading(false);
+                                      return console.log('Error: Invalid date. Return date has to be in the future.');
+                                    }
+                                    const new_date = new Date(event.currentTarget.value);
+                                    console.log('new return date: ', new_date);
+                                    // date picker counts months from 1, Date object counts months from 0, account for that
+                                    const derived_date = new Date(new_date.getFullYear(), new_date.getMonth() + 1, new_date.getDate());
+                                    console.log('formatted return date: ', formatDate(derived_date));
+                                    
+                                    if(derived_date.getTime() <= new Date().getTime())
+                                    {
+                                      this.props.setLoading(false);
+                                      return this.props.dispatch(UIActions.newNotification('danger', 'Error: date has to be in the future.'));
+                                    }
 
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">Notes</label>
-                  <textarea
-                    name="notes"
-                    value={this.state.new_booking.other}
-                    onChange={this.handleInputChange}
-                    style={{width: '580px', border: '1px solid #2FA7FF', borderRadius: '3px'}}
-                  />
-                </div>
-              </div>
+                                    console.log('derived_date>>>>', derived_date.getTime());
+                                    console.log('date_scheduled>>>>', new Date(tripBooking.date_scheduled).getTime());
 
-              <CustomButton
-                onClick={this.closeModal}
-                style={{width: '120px', height: '50px', float: 'right'}}
-                danger
-              >Dismiss
-              </CustomButton>
+                                    if(derived_date.getTime() < new Date(tripBooking.date_scheduled).getTime())
+                                    {
+                                      this.props.setLoading(false);
+                                      return this.props.dispatch(UIActions.newNotification('danger', 'Error: Return date cannot be before the scheduled date.'));
+                                    }
+                                    // update state
+                                    this.props.setLoading(true);
+                                    
+                                    tripBooking.return_date = derived_date.getTime();
+                                    this[tripBooking._id].value = formatDate(derived_date);
+                                    // update UI
+                                    this.setState({}); // TODO: update GUI from callback
 
-              <CustomButton
-                onClick={()=>{
-                  const booking = this.state.new_booking;
+                                    this.handleBookingUpdate(tripBooking);
+                                  }}
+                              />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><p>Adult Count:</p></td>
+                            <td>
+                              <input
+                                type='number'
+                                defaultValue={tripBooking.adult_count}
+                                onChange={(event) =>
+                                  {
+                                    console.log('adult count: ', event.currentTarget.value);
 
-                  if(!booking.client)
-                  {
-                    return this.props.dispatch({
-                      type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-                      payload: {
-                        type: 'danger',
-                        message: 'Invalid client selected',
-                      },
-                    });
-                  }
+                                    this.props.setLoading(true);
+                                    tripBooking.adult_count = event.currentTarget.value;
+                                    // update UI
+                                    this.setState({}); // TODO: update GUI from callback
+                                    this.handleBookingUpdate(tripBooking);
+                                  }}
+                              />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><p>Children Count:</p></td>
+                            <td>
+                              <input
+                                type='number'
+                                defaultValue={tripBooking.children_count}
+                                onChange={(event) =>
+                                  {
+                                    console.log('children count: ', event.currentTarget.value);
 
-                  if(!booking.contact)
-                  {
-                    return this.props.dispatch({
-                      type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-                      payload: {
-                        type: 'danger',
-                        message: 'Invalid contact person selected',
-                      },
-                    });
-                  }
-
-                  if(!booking.sitename)
-                  {
-                    return this.props.dispatch({
-                            type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-                            payload: {
-                              type: 'danger',
-                              message: 'Invalid sitename',
-                            },
-                          });
-                  }
-                  
-                  if(!booking.request)
-                  {
-                    return this.props.dispatch({
-                      type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-                      payload: {
-                        type: 'danger',
-                        message: 'Error: Invalid request',
-                      },
-                    });
-                  }
-
-                  // Prepare Booking
-                  const client_name = booking.client.client_name.toString();
-
-                  booking.object_number = this.props.enquiries.length;
-                  booking.client_name = client_name;
-                  booking.client_id = booking.client._id;
-                  booking.contact_person = booking.contact.name;
-                  booking.contact_person_id = booking.contact.usr;
-                  booking.account_name = client_name.toLowerCase().replace(' ', '-');
-                  booking.creator_name = SessionManager.getSessionUser().name;
-                  booking.creator = SessionManager.getSessionUser().usr;
-                  booking.creator_user = SessionManager.getSessionUser();
-                  booking.date_logged = new Date().getTime()/1000;// current date in epoch SECONDS
-
-                  this.setState({new_booking: booking, is_new_booking_modal_open: false});
-
-                  this.props.enquiries.push(this.state.new_booking);
-                  mapStateToProps(this.state);
-
-                  // this.props.dispatch({
-                  //   type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-                  //   payload: {
-                  //     type: 'success',
-                  //     message: 'Successfully created new booking',
-                  //   },
-                  // });
-
-                  // dispatch action to create booking on local & remote stores
-                  this.props.dispatch({
-                    type: ACTION_TYPES.QUOTE_NEW,
-                    payload: this.state.new_booking
-                  });
-                  
-                }}
-                style={{width: '120px', height: '50px', float: 'left'}}
-                success
-              >Create
-              </CustomButton>
+                                    this.props.setLoading(true);
+                                    tripBooking.children_count = event.currentTarget.value;
+                                    // update UI
+                                    this.setState({}); // TODO: update GUI from callback
+                                    this.handleBookingUpdate(tripBooking);
+                                  }}
+                              />
+                            </td>
+                          </tr>
+                          <tr>
+                            <td><p>Date Logged:</p></td>
+                            <td><p>{tripBooking.logged_date}</p></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>))
+              )}
             </div>
-          </Modal>
-
-          {/* TripBookingsTabContent table & Column toggles */}
-          <div style={{paddingTop: '0px'}}>
-            
-            {/* TripBookingsTabContent Table column toggles */}
-            <Transition
-              component={false}
-              enter={{
-                // top: 80,
-                translateY: this.state.column_toggles_top
-              }}
-              leave={{
-                // top: -70,
-                translateY: this.state.column_toggles_top
-              }}
-              ref={(el)=> this.col_toggles_container = el}
-              style={{
-                zIndex: '10',
-                background: 'rgb(180, 180, 180)',
-                left: window.innerWidth * 0.010 + '%',
-              }}
-            >  
-              <div key='col_toggle' style={{boxShadow: '0px 10px 35px #343434', position: 'fixed', top:  '130px', width: '1175px'}}>
-                <h2 style={{textAlign: 'center', fontWeight: 'lighter'}}>Show/Hide Table Columns</h2>
-                <Part>
-                  <Row>
-                    {/* ID column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Booking&nbsp;ID</label>
-                      <label className="switch">
-                        <input
-                          name="bookingID"
-                          type="checkbox"
-                          checked={this.state.col_id_visible}
-                          onChange={() =>
-                          {
-                            const is_id_visible = !this.state.col_id_visible;
-                            this.setState(
-                            {
-                              col_id_visible: is_id_visible,
-                              col_id_end: is_id_visible ? 190 + this.col_width : 190
-                              // col_id_end: this.state.col_id_visible ? 190: 380
-                            });
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Object # column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Booking&nbsp;No.</label>
-                      <label className="switch">
-                        <input
-                          name="bookingNumber"
-                          type="checkbox"
-                          checked={this.state.col_object_number_visible}
-                          onChange={() =>
-                          {
-                            const is_num_visible = !this.state.col_object_number_visible;
-
-                            this.setState(
-                            {
-                              col_object_number_visible: is_num_visible,
-                              col_object_number_end: is_num_visible ? this.col_id_end + this.col_width : this.col_id_end
-                              // col_object_number_end: this.state.col_object_number_visible ? this.state.col_id_end : this.state.col_id_end + 190
-                            });
-                            this.toggleColumnVisibility()
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Client column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Client</label>
-                      <label className="switch">
-                        <input
-                          name="clientID"
-                          type="checkbox"
-                          checked={this.state.col_client_id_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_client_id_visible: !this.state.col_client_id_visible
-                            });
-                            this.toggleColumnVisibility();
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Contact column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Contact</label>
-                      <label className="switch">
-                        <input
-                          name="contactID"
-                          type="checkbox"
-                          checked={this.state.col_contact_person_id_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_contact_person_id_visible: !this.state.col_contact_person_id_visible
-                            });
-                            this.toggleColumnVisibility()
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Sitename column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Sitename</label>
-                      <label className="switch">
-                        <input
-                          name="sitename"
-                          type="checkbox"
-                          checked={this.state.col_sitename_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_sitename_visible: !this.state.col_sitename_visible
-                            });
-                            this.toggleColumnVisibility()
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Request column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Request</label>
-                      <label className="switch">
-                        <input
-                          name="request"
-                          type="checkbox"
-                          checked={this.state.col_request_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_request_visible: !this.state.col_request_visible
-                            });
-                            this.toggleColumnVisibility();
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* VAT column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">VAT</label>
-                      <label className="switch">
-                        <input
-                          name="vat"
-                          type="checkbox"
-                          checked={this.state.col_vat_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_vat_visible: !this.state.col_vat_visible
-                            });
-                            this.toggleColumnVisibility();
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Revision column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Revision</label>
-                      <label className="switch">
-                        <input
-                          name="revision"
-                          type="checkbox"
-                          checked={this.state.col_revision_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_revision_visible: !this.state.col_revision_visible
-                            });
-                            this.toggleColumnVisibility();
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Status column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Status</label>
-                      <label className="switch">
-                        <input
-                          name="status"
-                          type="checkbox"
-                          checked={this.state.col_status_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_status_visible: !this.state.col_status_visible
-                            });
-                            this.toggleColumnVisibility();
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Creator column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Creator</label>
-                      <label className="switch">
-                        <input
-                          name="creator"
-                          type="checkbox"
-                          checked={this.state.col_creator_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_creator_visible: !this.state.col_creator_visible
-                            });
-                            this.toggleColumnVisibility();
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-
-                    {/* Date Logged column toggle */}
-                    <Field className="col-lg-1 col-md-2 col-sm-3 col-xs-4">
-                      <label className="itemLabel">Date&nbsp;Logged</label>
-                      <label className="switch">
-                        <input
-                          name="date_logged"
-                          type="checkbox"
-                          checked={this.state.col_date_logged_visible}
-                          onChange={() =>
-                          {
-                            this.setState(
-                            {
-                              col_date_logged_visible: !this.state.col_date_logged_visible
-                            });
-                            this.toggleColumnVisibility();
-                          }}
-                        />
-                        <span className="slider round" />
-                      </label>
-                    </Field>
-                  </Row>
-                  <Row>
-                    <CustomButton onClick={this.openModal} success>Create New Booking</CustomButton>
-                    <CustomButton
-                      success
-                      style={{marginLeft: '20px'}}
-                      onClick={() => 
-                      {
-                        if(this.state.column_toggles_top < -80)
-                          this.setState({column_toggles_top: -80});
-                        else
-                          this.setState({column_toggles_top: -200});
-                      }}
-                    >
-                  Toggle Filters
-                    </CustomButton>
-                  </Row>
-                </Part>
-              </div>
-            </Transition>
-
-            {/* List of Trip Bookings */}
-            {this.props.tripBookings.length === 0 ? (
-              <Message danger text='No enquiries were found in the system' style={{marginTop: '145px'}} />
-            ) : (
-              <div style={{maxHeight: 'auto', marginTop: '10px', backgroundColor: '#2BE8A2'}}>
-                <BootstrapTable
-                  id='tblTripBookingsTabContent'
-                  key='tblTripBookingsTabContent'
-                  data={enquiries}
-                  striped
-                  hover
-                  insertRow={false}
-                  // selectRow={(row)=>alert(row)}
-                  selectRow={{bgColor: 'red'}}
-                  expandableRow={this.isExpandableRow}
-                  expandComponent={this.expandComponent}
-                  trStyle={(row) => ({background: 'lightblue'})}
-                  expandColumnOptions={{
-                    expandColumnVisible: true,
-                    expandColumnComponent: this.expandColumnComponent,
-                    columnWidth: 50}}
-                  cellEdit={cellEditProp}
-                  dataFormatter={clientFormatter}
-                  options={options}
-                  pagination
-                  // onScroll={}
-                  version='4' // bootstrap version
-                >
-                  <TableHeaderColumn  
-                    // isKey
-                    dataField='_id'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed', left: '190px', background: 'lime'}}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    hidden={!this.state.col_id_visible}
-                  > Booking ID
-                  </TableHeaderColumn>
-
-                  <TableHeaderColumn
-                    isKey
-                    dataField='object_number'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={() => {this.state.col_id_visible?({position: 'fixed', background: 'red' }):({background: 'lime'})}}
-                    // thStyle={this.state.col_id_visible?{position: 'fixed', left: '400px',background: 'lime'}:{position: 'fixed', background: 'red'}}
-                    // thStyle={{position: 'fixed', left: this.state.col_id_end + 'px', background: 'lime'}}
-                    tdStyle={() => {({'fontWeight': 'lighter'})}}
-                    hidden={!this.state.col_object_number_visible}
-                  > Booking Number
-                  </TableHeaderColumn>
-
-                  <TableHeaderColumn
-                    dataField='client_name'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // editable={{type: 'select'}}
-                    customEditor={{
-                      getElement: (func, props) =>
-                        <ComboBox items={this.props.clients} selected_item={props.row.client} label='client_name' />
-                    }}
-                    // thStyle={{position: 'fixed', left: this.state.col_id_end + 240 + 'px', background: 'lime'}}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    hidden={!this.state.col_client_id_visible}
-                  > Client
-                  </TableHeaderColumn>
-
-                  <TableHeaderColumn
-                    dataField='contact_person'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed' }}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    hidden={!this.state.col_contact_person_id_visible}
-                    customEditor={{
-                      getElement: (func, props) =>
-                        <ComboBox items={this.props.users} selected_item={props.row.contact} label='name' />
-                    }}
-                  > Contact Person
-                  </TableHeaderColumn>
-                  
-                  <TableHeaderColumn
-                    dataField='sitename'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed' }}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    customEditor={{
-                      getElement: (func, props) => (
-                        <input
-                          type='text'
-                          defaultValue={props.row.sitename}
-                          onChange={(val) => {
-                            const sel_quo = props.row;
-                            sel_quo.sitename = val.currentTarget.value;
-                            this.setState( { selected_booking: sel_quo })
-                          }}
-                          onKeyPress={(evt) => this.handleBookingUpdate(evt, props.row)}
-                        />)
-                    }}
-                    hidden={!this.state.col_sitename_visible}
-                  > Sitename
-                  </TableHeaderColumn>
-
-                  <TableHeaderColumn
-                    dataField='request'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed' }}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    customEditor={{
-                      getElement: (func, props) => (
-                        <input
-                          type='text'
-                          defaultValue={props.row.request}
-                          onChange={(val) => {
-                            const sel_quo = props.row;
-                            sel_quo.request = val.currentTarget.value;
-                            this.setState( { selected_booking: sel_quo })
-                          }}
-                          onKeyPress={(evt) => this.handleBookingUpdate(evt, props.row)}
-                        />)
-                    }}
-                    hidden={!this.state.col_request_visible}
-                  >Request
-                  </TableHeaderColumn>
-
-                  <TableHeaderColumn
-                    dataField='vat'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed' }}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    hidden={!this.state.col_vat_visible}
-                  > VAT
-                  </TableHeaderColumn>
-
-                  <TableHeaderColumn
-                    dataField='revision'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed' }}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    hidden={!this.state.col_revision_visible}
-                  > Revision
-                  </TableHeaderColumn>
-                  
-                  <TableHeaderColumn
-                    dataField='status'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed' }}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    hidden={!this.state.col_status_visible}
-                  > Status
-                  </TableHeaderColumn>
-
-                  <TableHeaderColumn
-                    dataField='creator_name'
-                    dataSort
-                    ref={this.creator_ref}
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed', right: this.width, border: 'none' }}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    hidden={!this.state.col_creator_visible}
-                  > Creator
-                  </TableHeaderColumn>
-
-                  <TableHeaderColumn
-                    dataField='date_logged'
-                    dataSort
-                    caretRender={this.getCaret}
-                    // thStyle={{position: 'fixed', right: '-20px', border: 'none' }}
-                    tdStyle={{'fontWeight': 'lighter'}}
-                    hidden={!this.state.col_date_logged_visible}
-                  > Date Logged
-                  </TableHeaderColumn>
-                </BootstrapTable>
-              </div>
-            )}
-          </div>
         </div>
       </PageContent>
     );
