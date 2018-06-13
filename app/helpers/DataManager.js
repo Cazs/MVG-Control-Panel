@@ -13,6 +13,7 @@ export const db_clients = new Store('clients');
 export const db_materials = new Store('materials');
 export const db_trip_bookings = new Store('trip_bookings');
 export const db_accommodation_bookings = new Store('accommodation_bookings');
+export const db_accommodation_destinations = new Store('accommodation_destinations');
 
 export const authenticate = (dispatch, user) =>  new Promise((resolve, reject) =>
 {

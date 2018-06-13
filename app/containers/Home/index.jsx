@@ -14,6 +14,9 @@ import * as ACTION_TYPES from '../../constants/actions.jsx';
 import { TripBookingForm } from '../TripBookings/Form';
 import { AccommodationBookingForm } from '../AccommodationBookings/Form';
 
+// Selectors
+import { getAccommodationDestinations } from '../../reducers/AccommodationDestinationReducer';
+
 import
 {
   PageWrapper,
@@ -177,9 +180,10 @@ class Home extends Component
               setLoading={this.props.setLoading}
               dispatch={this.props.dispatch}
             />
-
+            
             <AccommodationBookingForm 
               style={{margin: '0px 0px 0px 0px'}}
+              // accommodationDestinations={this.state.accommodationDestinations}
               setAccommodationBookingFormVisible={this.setAccommodationBookingFormVisible}
               popover_visible={this.state.accommodation_booking_popover_visible}
               setLoading={this.props.setLoading}
@@ -190,9 +194,9 @@ class Home extends Component
               primary
               style={{width: '140px', height: '60px'}}
               onClick={()=>
-                {
-                  this.setTripBookingFormVisible(!this.state.trip_booking_popover_visible);
-                }}
+              {
+                this.setTripBookingFormVisible(!this.state.trip_booking_popover_visible);
+              }}
             >
               Transport
             </Button>
@@ -248,12 +252,14 @@ class Home extends Component
 Home.propTypes =
 {
   dispatch: PropTypes.func.isRequired,
-  changeTab: PropTypes.func.isRequired
+  changeTab: PropTypes.func.isRequired,
+  accommodationDestinations: PropTypes.array.isRequired
 };
 
 // Map state to props & Export
 const mapStateToProps = state => (
 {
+  accommodationDestinations: getAccommodationDestinations(state)
 });
 
 export default compose(

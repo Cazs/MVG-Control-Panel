@@ -36,15 +36,18 @@ const AccommodationBookingsMW = ({ dispatch, getState }) => next => action =>
     {
       console.log('accommodationBooking update:', action.payload);
       return DataManager.post(dispatch, DataManager.db_accommodation_bookings, action.payload, '/bookings/accommodation', 'accommodation_bookings')
-                        .then(response => next({ type: ACTION_TYPES.ACCOMMODATION_BOOKING_UPDATE, payload: response }));
+                        .then(response =>
+                          {
+                            if(action.callback)
+                              action.callback(response);
+                            // TODO: update in-memory db here instead of updating by GUI (Containers)
+                            next({ type: ACTION_TYPES.ACCOMMODATION_BOOKING_UPDATE, payload: getState().accommodationBookings })
+                          }).catch(err =>
+                          {
+                            if(action.callback)
+                              action.callback(undefined, err);
+                          });
     }
-
-    /* case ACTION_TYPES.ACCOMMODATION_BOOKING_TASK_ADD:
-    {
-      console.log('accommodationBooking task add:', action.payload);
-      return DataManager.put(dispatch, null, action.payload, '/bookings/accommodation/task', 'accommodationBooking tasks')
-                        .then(response => next({ type: ACTION_TYPES.ACCOMMODATION_BOOKING_TASK_ADD, payload: response }));
-    }*/
 
     case ACTION_TYPES.ACCOMMODATION_BOOKING_DELETE:
     {

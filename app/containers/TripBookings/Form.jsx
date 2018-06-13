@@ -188,6 +188,7 @@ export class TripBookingForm extends React.Component
                     {
                         this.props.setLoading(true);
 
+                        // TODO: check if user is signed in & authorised
                         if(!this.state.new_booking.pickup_location)
                         {
                             this.props.setLoading(false);
@@ -234,30 +235,14 @@ export class TripBookingForm extends React.Component
                         {
                             console.log('response data: ' + res);
                             context.props.setTripBookingFormVisible(false);
-                            context.props.dispatch(
-                            {
-                                type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-                                payload:
-                                {
-                                    type: 'success',
-                                    message: 'Successfully created your trip booking! We\'ll get back to you soon.'
-                                }
-                            });
-                            // this.props.changeTab('login');
+                            context.props.dispatch(UIActions.newNotification('success', 'Successfully created your trip booking! We\'ll get back to you soon.'));
+                            
                             context.props.setLoading(false);
                         })
                         .catch(err =>
                         {
                             console.log('error: ', err);
-                            context.props.dispatch(
-                            {
-                                type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-                                payload:
-                                {
-                                type: 'danger',
-                                message: err.message
-                                }
-                            });
+                            context.props.dispatch(UIActions.newNotification('danger', err.message));
                             context.props.setLoading(false);
                         });
                     }}
@@ -270,7 +255,7 @@ export class TripBookingForm extends React.Component
     }
 }
 
-export const trip_types = [{type_name: 'One-Way'}, {type_name: 'Return'}];
+export const trip_types = [{ type_name: 'One-Way' }, { type_name: 'Return' }];
 
 export const newBooking = () =>
 {

@@ -10,6 +10,7 @@ import ClientsReducer from './ClientsReducer';
 import MaterialsReducer from './MaterialsReducer';
 import TripsBookingsReducer from './TripBookingsReducer';
 import AccommodationBookingsReducer from './AccommodationBookingsReducer';
+import AccommodationDestinationsReducer from './AccommodationDestinationReducer';
 
 export default combineReducers(
 {
@@ -21,5 +22,6 @@ export default combineReducers(
   materials: MaterialsReducer,
   clients: ClientsReducer,
   accommodationBookings: AccommodationBookingsReducer,
-  tripBookings: TripsBookingsReducer
+  tripBookings: TripsBookingsReducer,
+  accommodationDestinations: AccommodationDestinationsReducer
 });

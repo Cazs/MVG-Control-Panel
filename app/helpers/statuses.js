@@ -18,19 +18,23 @@ export const trip_booking_statuses =
     }
 ];
 
-export const accommodation_statuses = 
+export const accommodation_booking_statuses = 
 [
     {
     status: 0,
-    status_description: 'pending'
+    status_description: 'pending, awaiting confirmation'
     },
     {
     status: 1,
-    status_description: 'approved'
+    status_description: 'confirmed/ready'
     },
     {
     status: 2,
-    status_description: 'denied'
+    status_description: 'complete'
+    },
+    {
+    status: 3,
+    status_description: 'cancelled'
     }
 ];
 
@@ -42,7 +46,7 @@ const general_statuses =
     },
     {
     status: 1,
-    status_description: 'Authorised'
+    status_description: 'Ready'
     },
     {
     status: 2,

@@ -20,6 +20,7 @@ import ClientsMW from '../middlewares/ClientsMW';
 import MaterialsMW from '../middlewares/MaterialsMW';
 import TripBookingsMW from '../middlewares/TripBookingsMW';
 import AccommodationBookingsMW from '../middlewares/AccommodationBookingsMW';
+import AccommodationDestinationMW from '../middlewares/AccommodationDestinationsMW';
 
 const middlewares = 
 [
@@ -31,7 +32,8 @@ const middlewares =
   ClientsMW,
   MaterialsMW,
   TripBookingsMW,
-  AccommodationBookingsMW
+  AccommodationBookingsMW,
+  AccommodationDestinationMW
 ];
 
 // Dev Mode Middlewares

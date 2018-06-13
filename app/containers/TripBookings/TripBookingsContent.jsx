@@ -221,11 +221,11 @@ export class TripBookingsTabContent extends React.Component
                                 type='text'
                                 value={tripBooking.destination}
                                 onChange={(event) =>
-                                  {
-                                    tripBooking.destination = event.currentTarget.value;
-                                    console.log('destination: ', event.currentTarget.value);
-                                    this.setState({}); // TODO: update GUI from callback
-                                  }}
+                                {
+                                  tripBooking.destination = event.currentTarget.value;
+                                  console.log('destination: ', event.currentTarget.value);
+                                  this.setState({}); // TODO: update GUI from callback
+                                }}
                                 onKeyPress={(event) =>
                                 {
                                   if(event.key == 'Enter')

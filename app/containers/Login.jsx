@@ -25,6 +25,7 @@ import * as ClientActions from '../actions/clients';
 import * as MaterialActions from '../actions/materials';
 import * as TripBookingActions from '../actions/trip_bookings';
 import * as AccommodationBookingActions from '../actions/accommodation_bookings';
+import * as AccommodationDestinationActions from '../actions/accommodation_destinations';
 
 import
 {
@@ -116,6 +117,7 @@ class Login extends Component
     dispatch(MaterialActions.getMaterials());
     dispatch(TripBookingActions.getTripBookings());
     dispatch(AccommodationBookingActions.getAccommodationBookings());
+    dispatch(AccommodationDestinationActions.getAccommodationDestinations());
   }
 
   // Render Main Content
