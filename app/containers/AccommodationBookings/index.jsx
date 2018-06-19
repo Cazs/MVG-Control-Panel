@@ -9,7 +9,7 @@ import { isEqual } from 'lodash';
 import { getUsers } from '../../reducers/UsersReducer';
 import { getMaterials } from '../../reducers/MaterialsReducer';
 import { getClients } from '../../reducers/ClientsReducer';
-import { getAccommodationDestinations } from '../../reducers/AccommodationDestinationReducer';
+import { getAllAccommodationDestinations } from '../../reducers/AccommodationDestinationReducer';
 
 // Components
 import { Field, Part, Row } from '../../components/shared/Part';

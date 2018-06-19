@@ -24,7 +24,7 @@ import * as ACTION_TYPES from '../../constants/actions.jsx';
 import * as UIActions from '../../actions/ui';
 
 // Selectors
-import { getAccommodationDestinations } from '../../reducers/AccommodationDestinationReducer';
+import { getAllAccommodationDestinations } from '../../reducers/AccommodationDestinationReducer';
 import { getAccommodationBookings } from '../../reducers/AccommodationBookingsReducer';
 
 // Components
@@ -405,7 +405,7 @@ const mapStateToProps = state =>
 {
   return ({
     accommodationBookings: getAccommodationBookings(state),
-    accommodationDestinations: getAccommodationDestinations(state)
+    accommodationDestinations: getAllAccommodationDestinations(state)
   })
 };
 

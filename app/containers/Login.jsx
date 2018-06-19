@@ -117,7 +117,7 @@ class Login extends Component
     dispatch(MaterialActions.getMaterials());
     dispatch(TripBookingActions.getTripBookings());
     dispatch(AccommodationBookingActions.getAccommodationBookings());
-    // dispatch(AccommodationDestinationActions.getAccommodationDestinations());
+    // dispatch(AccommodationDestinationActions.getAllAccommodationDestinations());
   }
 
   // Render Main Content

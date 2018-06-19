@@ -1,7 +1,7 @@
 import * as ACTION_TYPES from '../constants/actions.jsx';
 import { createAction } from 'redux-actions';
 
-export const getAccommodationDestinations = createAction(ACTION_TYPES.ACCOMMODATION_DESTINATION_GET_ALL);
+export const getAllAccommodationDestinations = createAction(ACTION_TYPES.ACCOMMODATION_DESTINATION_GET_ALL);
 
 export const duplicateAccommodationDestination = createAction(
   ACTION_TYPES.ACCOMMODATION_DESTINATION_DUPLICATE,

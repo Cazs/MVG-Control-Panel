@@ -22,7 +22,7 @@ class ComboBox extends React.Component
       return (
         <span>
           <select
-            defaultValue={this.props.value ? this.props.value : ' '}
+            defaultValue={this.props.value ? this.props.value :  this.props.items[0]}
             onKeyDown={this.props.onKeyDown}
             onChange={(ev) =>
                       {
@@ -35,10 +35,11 @@ class ComboBox extends React.Component
                 this.props.items.map(item =>
                   (<option
                       key={item._id}
-                      value={item[this.props.label]}
+                      value={this.props.label ? item[this.props.label] : item}
+                      // value={typeof this.props.label == undefined ? item: item[this.props.label]}
                       // selected={this.props.value ? item[this.props.label] === this.props.value : false}
                     >
-                      { item[this.props.label] }
+                      { this.props.label ? item[this.props.label] : item }
                     </option>)
                   ) : (<option />)
             }
@@ -52,7 +53,7 @@ class ComboBox extends React.Component
   {
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     // value: PropTypes.object.isRequired,
-    label: PropTypes.string.isRequired
+    // label: PropTypes.string.isRequired
   };
 
   export default ComboBox;

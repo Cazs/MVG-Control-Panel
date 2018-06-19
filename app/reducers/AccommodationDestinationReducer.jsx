@@ -5,7 +5,7 @@ import * as Actions from '../actions/accommodation_destinations';
 const AccommodationDestinationsReducer = handleActions(
   {
     [combineActions(
-      Actions.getAccommodationDestinations,
+      Actions.getAllAccommodationDestinations,
       Actions.updateAccommodationDestination,
       Actions.deleteAccommodationDestination,
       Actions.setAccommodationDestinationStatus
@@ -17,9 +17,9 @@ const AccommodationDestinationsReducer = handleActions(
 export default AccommodationDestinationsReducer;
 
 // Selector
-const getAccommodationDestinationsState = (state) => state.accommodationDestinations;
+const getAllAccommodationDestinationsState = (state) => state.accommodationDestinations;
 
-export const getAccommodationDestinations = createSelector(
-  getAccommodationDestinationsState,
+export const getAllAccommodationDestinations = createSelector(
+  getAllAccommodationDestinationsState,
   accommodationDestinations => accommodationDestinations
 );

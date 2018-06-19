@@ -17,7 +17,7 @@ import { TripBookingForm } from '../TripBookings/Form';
 import { AccommodationBookingForm } from '../AccommodationBookings/Form';
 
 // Selectors
-import { getAccommodationDestinations } from '../../reducers/AccommodationDestinationReducer';
+import { getAllAccommodationDestinations } from '../../reducers/AccommodationDestinationReducer';
 
 import
 {
@@ -508,7 +508,7 @@ Home.propTypes =
 // Map state to props & Export
 const mapStateToProps = state => (
 {
-  accommodationDestinations: getAccommodationDestinations(state)
+  accommodationDestinations: getAllAccommodationDestinations(state)
 });
 
 export default compose(

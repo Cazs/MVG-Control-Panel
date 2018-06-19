@@ -14,7 +14,7 @@ import * as ACTION_TYPES from '../../constants/actions.jsx';
 import * as UIActions from '../../actions/ui';
 
 // Helpers
-import  * as DataManager from '../../helpers/DataManager';
+import * as DataManager from '../../helpers/DataManager';
 import sessionManager from '../../helpers/SessionManager';
 import Log from '../../helpers/Logger';
 
@@ -23,17 +23,19 @@ export class AccommodationBookingForm extends React.Component
     constructor(props)
     {
         super(props);
-        this.getAccommodationDestinations = this.getAccommodationDestinations.bind(this);
+        this.getAllAccommodationDestinations = this.getAllAccommodationDestinations.bind(this);
+        this.filter_container = {};// React.createRef();
 
         this.state = 
         {
           new_booking: newBooking(),
           accommodationDestinations: [],
-          is_loading_destinations: true
+          is_loading_destinations: true,
+          selected_filters:[]
         }
     }
 
-    getAccommodationDestinations(callback)
+    getAllAccommodationDestinations(callback)
     {
       const {setState} = this;
       
@@ -44,52 +46,131 @@ export class AccommodationBookingForm extends React.Component
       });
     }
 
+    componentDidUpdate()
+    {
+      if(this.filters_container)
+        if(this.filters_container.childElementCount > 0)
+          // Note: {behavior: 'smooth', block: 'end'} is currently not supported in Safari WebKit, but since this is Electron ... */
+          this.filters_container.lastElementChild.scrollIntoView({behavior: 'smooth'});
+    }
+
     render()
     {
+      const filters = ['name', 'description', 'cost_per_night_adults', 'cost_per_night_children', 'country', 'state_province', 'city', 'town', 'street', 'unit_number', 'zip_code', 'rating'];
+
         return (
         <div>
+          {/* Filters container */}
           <div
             style={{
-              // float: 'left',
+              float: 'right',
               width: '600px',
               backgroundColor: 'rgba(0,0,0,.9)',
               boxShadow: '0px 0px 35px #000',
               borderRadius: '10px',
               zIndex: 100,
-              padding: '15px'
+              padding: '15px',
+              margin: '-120px 0px 0px 0px'
             }}
             hidden={!this.props.popover_visible}
           >
-          <div style={{paddingTop: '1px', width: '100%'}} >
-            <div style={{width: '10px', height: '20px', float: 'right', margin: '-18px -8px 0px 0px'}}>
-              <CloseButton
-                className="ion-close-circled"
-                onClick={() => this.props.setAccommodationBookingFormVisible(false)}
-              />
+            <div style={{paddingTop: '1px', width: '100%'}} >
+              <div style={{width: '10px', height: '20px', float: 'right', margin: '-18px -8px 0px 0px'}}>
+                <CloseButton
+                  className="ion-close-circled"
+                  onClick={() => this.props.setAccommodationBookingFormVisible(false)}
+                />
+              </div>
             </div>
-          </div>
-            <div className='row'>
-              <div className='pageItem col-md-6'>
-                <label className="itemLabel" style={{color:'#fff'}}>Accommodation Destination: </label>
-              </div>
-              <div className='pageItem col-md-6'>
-                <ComboBox
-                  ref={(cbx) => this.cbx_destinations = cbx}
-                  items={this.state.accommodationDestinations}
-                  label='name'
-                  value={this.state.accommodationDestinations ? this.state.accommodationDestinations[0] : ''}
-                  onUpdate={(newValue) =>
+            <h1 style={{textAlign: 'center', color: '#fff'}}>Accommodation Search</h1>
+            <h2 style={{textAlign: 'center', color: '#fff'}}>Filters</h2>
+            <div ref={filters_container => this.filters_container = filters_container} className='row' style={{border: '1px solid #fff', borderRadius: '5px', maxHeight: '200px', overflowY: 'scroll'}}>
+              {
+                this.state.selected_filters.map((filter, index) =>
+                (<div
+                  key={filter.name+'_'+filter.value}
+                  className='pageItem col-md-6'
+                  style={{background: 'rgba(255,255,255,.7)', borderRadius: '5px', border: '3px solid #343434', padding: '5px'}}
+                  ref={elem => this.filter_container[filter.name+'_'+filter.value] = elem}
+                  >
+                  {/* <label className="itemLabel" style={{color:'#fff'}}>Accommodation Destination: </label> */}
+                  <div style={{paddingTop: '1px', width: '100%'}} >
+                    <div style={{width: '10px', height: '20px', float: 'right', margin: '-11px -0px 0px 0px'}}>
+                      <CloseButton
+                        className="ion-close-circled"
+                        onClick={() =>
+                          {
+                            console.log('selected filters BEFORE removal: ', this.state.selected_filters);
+
+                            // let i = this.state.selected_filters.indexOf(filter);
+                            // delete this.state.selected_filters[i];
+                            let selected_filters = this.state.selected_filters.slice(); // get copy of selected filters array
+                            selected_filters.splice(index, 1); // remove current filter from array
+                            // update the real array
+                            this.setState({selected_filters});
+
+                            console.log('selected filters AFTER removal: ', this.state.selected_filters);
+                          }}
+                      />
+                    </div>
+                  </div>
+                  <ComboBox
+                    items={filters}
+                    style={{paddingTop: '10px'}}
+                    value={filter.name}
+                    onUpdate={newValue =>
+                    {
+                      filter.name = newValue;
+                    }} />
+                  <input 
+                    type='text'
+                    style={{marginTop: '10px'}}
+                    defaultValue={filter.value}
+                    onChange={(event)=> filter.value = event.currentTarget.value}
+                  />
+                </div>))
+              }
+            </div>
+            <div className="row">
+              <button
+                className="btn btn-primary"
+                style={{width: '175px', height: '50px', margin: '15px auto 0px auto'}}
+                onClick={event => 
+                {
+                  let selected_filters = this.state.selected_filters.slice();
+
+                  var i = 0;
+                  let new_filter =
                   {
-                    const booking = this.state.new_booking;
-                    booking.accommodation_destination_id = newValue._id;
-                    // update UI
-                    this.setState({new_booking: booking});
-                  }} />
-              </div>
+                    name: filters[i], // TODO: choose unused filter
+                    value: ''
+                  }
+                  // if user chose filter that's already been added, try look for one that hasn't been used
+                  while(selected_filters.filter(filter => filter.name === new_filter.name).length > 0)
+                  {
+                    if(i+1 < filters.length)
+                      i++;
+                    else break;
+                    new_filter.name = filters[i];
+                    console.log('filter has been used, trying filter: ', new_filter);
+                  }
+
+                  console.log('settled on filter: ', new_filter);
+
+                  if(selected_filters.filter(filter => filter.name === new_filter.name).length == 0) // if filter not added yet
+                  {
+                    selected_filters.push(new_filter); // add it
+                    this.setState({selected_filters}); // update UI
+                  } else alert('filter already exists in list.');
+                }}
+              >
+                <span className="ion-plus"/>
+                Add Search Filter
+              </button>
             </div>
             <div className="row">
               <div className="pageItem col-md-6">
-                <label className="itemLabel" style={{color:'#fff'}}>From</label>
+                <label className="itemLabel" style={{color:'#fff'}}>Check-in</label>
                 <input
                   name="date_scheduled"
                   type="date"
@@ -109,7 +190,7 @@ export class AccommodationBookingForm extends React.Component
               </div>
 
               <div className="pageItem col-md-6">
-                <label className="itemLabel" style={{color:'#fff'}}>Till</label>
+                <label className="itemLabel" style={{color:'#fff'}}>Check-out</label>
                 <input
                   name="return_date"
                   type="date"
@@ -162,18 +243,17 @@ export class AccommodationBookingForm extends React.Component
               </div>
             </div>
             <div className="row">
-              <Button
-                primary
+              <button
+                className="btn btn-success"
                 style={{width: '140px', height: '60px', marginLeft: '37%'}}
                 onClick={()=>
                 {
                   this.props.setLoading(true);
 
-                  // TODO: check if user is signed in & authorised
-                  if(!this.cbx_destinations.props.value)
+                  if(!this.state.selected_filters.length > 0)
                   {
                     this.props.setLoading(false);
-                    return this.props.dispatch(UIActions.newNotification('danger', 'Please choose a valid destination from list.'));
+                    return this.props.dispatch(UIActions.newNotification('danger', 'Please choose at least one valid search filter'));
                   }
 
                   if(this.state.new_booking.date_scheduled <= 0)
@@ -196,59 +276,77 @@ export class AccommodationBookingForm extends React.Component
 
                   if(this.state.new_booking.adult_count <= 0 && this.state.new_booking.children_count <= 0)
                   {
-                      this.props.setLoading(false);
+                    this.props.setLoading(false);
                       return this.props.dispatch(UIActions.newNotification('danger', 'Children or adult count must be greater than 0.'));
                   }
 
-                  // search for destinations (on server) matching criteria
-                  if(this.state.is_loading_destinations)
-                    this.getAccommodationDestinations((accommodation_destinations) =>
-                    {
-                      this.setState({accommodationDestinations: accommodation_destinations, is_loading_destinations: false});
-                    });
-                  
-                  this.state.new_booking.accommodation_destination_id = this.cbx_destinations.props.value._id;
                   const context = this;
 
-                  console.log('verbose_info: putting ', this.state.new_booking);
+                  // search for destinations (on server) matching criteria/filters
+                  const encoded_filters = this.state.selected_filters.map(filter => filter.name + '=' + encodeURI(filter.value)).join('\+');
+                  console.log('encoded filter:', encoded_filters);
                   // Send request
-                  DataManager.put(this.props.dispatch, DataManager.db_accommodation_bookings, this.state.new_booking, '/bookings/accommodation', 'accommodation_bookings')
+                  DataManager.get('/destinations/'+encoded_filters)
                               .then(res =>
                               {
-                                console.log('response data: ' + res);
-                                context.props.setAccommodationBookingFormVisible(false);
-                                context.props.dispatch(UIActions.newNotification('success', 'Successfully created your trip booking! We\'ll get back to you soon.'));
-                                
                                 context.props.setLoading(false);
+                                console.log('response data: ', res);
+                                context.setState({accommodationDestinations: res ? res.data : [], is_loading_destinations: false});
+                                console.log('destinations: ', this.state.accommodationDestinations);
+                                // context.props.setAccommodationBookingFormVisible(false);
+                                // context.props.dispatch(UIActions.newNotification('success', 'Successfully created your trip booking! We\'ll get back to you soon.'));
                               })
                               .catch(err =>
                               {
-                                  console.log('error: ', err);
-                                  context.props.dispatch(UIActions.newNotification('danger', err.message));
-                                  context.props.setLoading(false);
+                                context.props.setLoading(false);
+                                console.log('error: ', err);
+                                context.props.dispatch(UIActions.newNotification('danger', 'Error: ' + err.message));
                               });
                 }}
               >
                 Search
-              </Button>
+              </button>
             </div>
           </div>
+          {/* Destinations container */}
           <div
             style={{
-              // float: 'left',
+              float: 'left',
               width: '600px',
               backgroundColor: 'rgba(0,0,0,.9)',
               boxShadow: '0px 0px 35px #000',
               borderRadius: '10px',
               zIndex: 100,
-              padding: '15px'
+              padding: '15px',
+              margin: '-120px 20px 0px 0px'
             }}
             hidden={!this.props.popover_visible}
           >
             <div className="row">
-              <div className="pageItem col-lg-4" style={{width: '50px', height: '50px', backgroundColor: 'lime', padding: '5px'}}/>
-              <div className="pageItem col-lg-4"/>
-              <div className="pageItem col-lg-4"/>
+              {this.state.accommodationDestinations.map(destination =>
+              (
+                <div
+                  className="pageItem col-lg-6"
+                  style={{
+                    
+                  }}
+                >
+                  <div style={{
+                    width: '90%',
+                    borderRadius: '5px',
+                    border: '2px solid #3c3c3c',
+                    background: 'rgba(255,255,255,.4)',
+                    padding: '5px',
+                    margin: 'auto'
+                    }}>
+                    <label className="itemLabel" style={{color:'#fff'}}>Name: {destination.name}</label>
+                    <label className="itemLabel" style={{color:'#fff'}}>Summary: {destination.description}</label>
+                    <p style={{color:'#000', textAlign: 'center'}}>Cost per night</p>
+                    <label className="itemLabel" style={{color:'#fff'}}>Adults: {destination.currency}&nbsp;{destination.cost_per_night_adults}</label>
+                    <label className="itemLabel" style={{color:'#fff'}}>Children: {destination.currency}&nbsp;{destination.cost_per_night_children}</label>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>);

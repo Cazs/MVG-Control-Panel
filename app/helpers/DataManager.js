@@ -132,60 +132,30 @@ export const getAll = (dispatch, action, endpoint, db, collection_name) => new P
               });
 });
 
-const get = (dispatch, endpoint, collection_name, callback) => 
+export const get = (endpoint) =>  new Promise((resolve, reject) =>
 {
     const { HttpClient } = require('../helpers/HttpClient');
     return HttpClient.get(endpoint, {headers: {'Content-Type': 'application/json;', session_id: sessionManager.getSessionId()}})
                       .then(response =>
                       { 
                         if(response)
-                        {
                           if(response.status == 200) // Success, found some records
-                          {
-                            if(callback)
-                                callback(response.data._embedded);
-                            else return dispatch(UIActions.newNotification('warning', 'Warning : No callback after get().'));
-                          } else if(response.status == 204) // No content
-                          {
-                            Log('warning', 'Error ['+response.status+']: No '+collection_name+' were found in the database.');
-                            // dispatch(UIActions.newNotification('warning', 'Error ['+response.status+']: No '+collection_name+' were found in the database.'));
-                            // execute callback w/o args
-                            if(callback)
-                              callback([]);
-                            // next(Object.assign({}, action, { payload: [] }));
-                          } else if(response.status == 401) // Unauthorised
-                          {
-                            if(callback)
-                              callback(new Error('Error ['+response.status+']: You are not authorised to view ' + collection_name));
-                            return dispatch(UIActions.newNotification('warning', 'Error ['+response.status+']: You are not authorised to view ' + collection_name));
-                          } else { // Some other error
-                            // execute callback w/o args
-                            if(callback)
-                              callback([]);
-                            // next(Object.assign({}, action, { payload: [] }));
-                            return dispatch(UIActions.newNotification('danger', 'Error: ' + response.status));
-                          }
-                        } else { // No response
-                          dispatch(UIActions.newNotification('danger', 'Error: Could not get a valid response from the server.'));
-                          // execute callback w/o args
-                          if(callback)
-                            callback([]);
-                          // next(Object.assign({}, action, { payload: [] }));
-                        }
+                            return resolve(response);
+                          else if(response.status == 204) // No content
+                            return reject(new Error('warning', 'Error ['+response.status+']: No records were found in the database.'));
+                          else if(response.status == 401) // Unauthorised
+                            return reject(new Error('Error ['+response.status+']: You are not authorised to view these records.'));
+                          else // Some other error
+                            return reject(new Error('Error: ' + response.status));
+                        else // No response
+                          return reject(new Error('Error: Could not get a valid response from the server.'));
+                          
                       })
                       .catch(err => 
                       {
-                        dispatch(
-                        {
-                          type: ACTION_TYPES.UI_NOTIFICATION_NEW,
-                          payload:
-                        {
-                            type: 'warning',
-                            message: err.message,
-                          },
-                        });
+                        return reject(err);
                       });
-}
+});
 
 // will insert to local storage if successfully created on remote db
 export const put = (dispatch, db, resource, endpoint, collection_name) =>  new Promise((resolve, reject) =>
