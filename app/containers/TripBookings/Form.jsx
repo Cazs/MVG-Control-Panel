@@ -3,6 +3,7 @@ import React from 'react';
 // Components
 import ComboBox from '../../components/shared/ComboBox';
 import Button from '../../components/shared/Button';
+import CloseButton from '../../components/shared/CloseButton';
 
 // Actions
 import * as ACTION_TYPES from '../../constants/actions.jsx';
@@ -40,79 +41,88 @@ export class TripBookingForm extends React.Component
               }}
               hidden={!this.props.popover_visible}
             >
-              <div className="row">
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">Pickup&nbsp;Address</label>
-                  <input
-                    id="pickup_location"
-                    name="pickup_location"
-                    type="text"
-                    value={this.state.new_booking.pickup_location}
-                    onChange={(new_val)=> {
-                        const booking = this.state.new_booking;
-                        
-                        booking.pickup_location = new_val.currentTarget.value;
-                        this.setState({new_booking: booking});
-                      }}
-                    style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-                  />
+                <div style={{paddingTop: '1px', width: '100%'}} >
+                    <div style={{width: '10px', height: '20px', float: 'right', margin: '-18px -8px 0px 0px'}}>
+                        <CloseButton
+                            className="ion-close-circled"
+                            onClick={() => this.props.setTripBookingFormVisible(false)}
+                        />
+                    </div>
                 </div>
 
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">Destination&nbsp;Address</label>
-                  <input
-                    id="destination"
-                    name="destination"
-                    type="text"
-                    value={this.state.new_booking.destination}
-                    onChange={(new_val)=> {
-                        const booking = this.state.new_booking;
-                        
-                        booking.destination = new_val.currentTarget.value;
-                        this.setState({new_booking: booking});
-                      }}
-                    style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-                  />
-                </div>
-              </div>
-
-              <div className="row">
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">Number&nbsp;of&nbsp;Adults</label>
-                  <input
-                    id="adult_count"
-                    name="adult_count"
-                    type="number"
-                    value={this.state.new_booking.adult_count}
-                    onChange={(new_val)=>
-                        {
-                          const booking = this.state.new_booking;
-                          
-                          booking.adult_count = new_val.currentTarget.value;
-                          this.setState({new_booking: booking});
+                <div className="row">
+                    <div className="pageItem col-md-6">
+                    <label className="itemLabel">Pickup&nbsp;Address</label>
+                    <input
+                        id="pickup_location"
+                        name="pickup_location"
+                        type="text"
+                        value={this.state.new_booking.pickup_location}
+                        onChange={(new_val)=> {
+                            const booking = this.state.new_booking;
+                            
+                            booking.pickup_location = new_val.currentTarget.value;
+                            this.setState({new_booking: booking});
                         }}
-                    style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-                  />
+                        style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
+                    />
+                    </div>
+
+                    <div className="pageItem col-md-6">
+                    <label className="itemLabel">Destination&nbsp;Address</label>
+                    <input
+                        id="destination"
+                        name="destination"
+                        type="text"
+                        value={this.state.new_booking.destination}
+                        onChange={(new_val)=> {
+                            const booking = this.state.new_booking;
+                            
+                            booking.destination = new_val.currentTarget.value;
+                            this.setState({new_booking: booking});
+                        }}
+                        style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
+                    />
+                    </div>
                 </div>
 
-                <div className="pageItem col-md-6">
-                  <label className="itemLabel">Number&nbsp;of&nbsp;Children</label>
-                  <input
-                    id="child_count"
-                    name="child_count"
-                    type="number"
-                    value={this.state.new_booking.children_count}
-                    onChange={(new_val)=>
-                        {
-                          const booking = this.state.new_booking;
-                          
-                          booking.children_count = new_val.currentTarget.value;
-                          this.setState({new_booking: booking});
-                        }}
-                    style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
-                  />
+                <div className="row">
+                    <div className="pageItem col-md-6">
+                    <label className="itemLabel">Number&nbsp;of&nbsp;Adults</label>
+                    <input
+                        id="adult_count"
+                        name="adult_count"
+                        type="number"
+                        value={this.state.new_booking.adult_count}
+                        onChange={(new_val)=>
+                            {
+                            const booking = this.state.new_booking;
+                            
+                            booking.adult_count = new_val.currentTarget.value;
+                            this.setState({new_booking: booking});
+                            }}
+                        style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
+                    />
+                    </div>
+
+                    <div className="pageItem col-md-6">
+                    <label className="itemLabel">Number&nbsp;of&nbsp;Children</label>
+                    <input
+                        id="child_count"
+                        name="child_count"
+                        type="number"
+                        value={this.state.new_booking.children_count}
+                        onChange={(new_val)=>
+                            {
+                            const booking = this.state.new_booking;
+                            
+                            booking.children_count = new_val.currentTarget.value;
+                            this.setState({new_booking: booking});
+                            }}
+                        style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
+                    />
+                    </div>
                 </div>
-              </div>
 
                 <div className="row">
                     <div className="pageItem col-md-6">
@@ -180,76 +190,76 @@ export class TripBookingForm extends React.Component
                     </div>
                 </div>
 
-              <div className="row">
-                <Button
-                  primary
-                  style={{width: '140px', height: '60px', marginLeft: '37%'}}
-                  onClick={()=>
-                    {
-                        this.props.setLoading(true);
-
-                        // TODO: check if user is signed in & authorised
-                        if(!this.state.new_booking.pickup_location)
+                <div className="row">
+                    <Button
+                    primary
+                    style={{width: '140px', height: '60px', marginLeft: '37%'}}
+                    onClick={()=>
                         {
-                            this.props.setLoading(false);
-                            return this.props.dispatch(UIActions.newNotification('danger', 'Invalid pickup address.'));
-                        }
+                            this.props.setLoading(true);
 
-                        if(!this.state.new_booking.destination)
-                        {
-                            this.props.setLoading(false);
-                            return this.props.dispatch(UIActions.newNotification('danger', 'Invalid destination address.'));
-                        }
+                            // TODO: check if user is signed in & authorised
+                            if(!this.state.new_booking.pickup_location)
+                            {
+                                this.props.setLoading(false);
+                                return this.props.dispatch(UIActions.newNotification('danger', 'Invalid pickup address.'));
+                            }
 
-                        if(this.state.new_booking.adult_count <= 0 && this.state.new_booking.children_count <= 0)
-                        {
-                            this.props.setLoading(false);
-                            return this.props.dispatch(UIActions.newNotification('danger', 'Children or adult count must be greater than 0.'));
-                        }
+                            if(!this.state.new_booking.destination)
+                            {
+                                this.props.setLoading(false);
+                                return this.props.dispatch(UIActions.newNotification('danger', 'Invalid destination address.'));
+                            }
 
-                        if(this.state.new_booking.date_scheduled <= 0)
-                        {
-                            this.props.setLoading(false);
-                            return this.props.dispatch(UIActions.newNotification('danger', 'Invalid scheduled date.'));
-                        }
+                            if(this.state.new_booking.adult_count <= 0 && this.state.new_booking.children_count <= 0)
+                            {
+                                this.props.setLoading(false);
+                                return this.props.dispatch(UIActions.newNotification('danger', 'Children or adult count must be greater than 0.'));
+                            }
 
-                        if(!this.state.new_booking.trip_type)
-                        {
-                            this.props.setLoading(false);
-                            return this.props.dispatch(UIActions.newNotification('danger', 'Invalid trip type.'));
-                        }
+                            if(this.state.new_booking.date_scheduled <= 0)
+                            {
+                                this.props.setLoading(false);
+                                return this.props.dispatch(UIActions.newNotification('danger', 'Invalid scheduled date.'));
+                            }
 
-                        if(this.state.new_booking.trip_type == trip_types[1].type_name
-                            && this.state.new_booking.return_date <= 0) // if is return trip and return date <= 0
-                        {
-                            this.props.setLoading(false);
-                            return this.props.dispatch(UIActions.newNotification('danger', 'Invalid return date.'));
-                        }
+                            if(!this.state.new_booking.trip_type)
+                            {
+                                this.props.setLoading(false);
+                                return this.props.dispatch(UIActions.newNotification('danger', 'Invalid trip type.'));
+                            }
 
-                        const context = this;
+                            if(this.state.new_booking.trip_type == trip_types[1].type_name
+                                && this.state.new_booking.return_date <= 0) // if is return trip and return date <= 0
+                            {
+                                this.props.setLoading(false);
+                                return this.props.dispatch(UIActions.newNotification('danger', 'Invalid return date.'));
+                            }
 
-                        console.log('verbose_info: putting ', this.state.new_booking);
-                        // Send request
-                        DataManager.put(this.props.dispatch, DataManager.db_trip_bookings, this.state.new_booking, '/bookings/trips', 'trip_bookings')
-                        .then(res =>
-                        {
-                            console.log('response data: ' + res);
-                            context.props.setTripBookingFormVisible(false);
-                            context.props.dispatch(UIActions.newNotification('success', 'Successfully created your trip booking! We\'ll get back to you soon.'));
-                            
-                            context.props.setLoading(false);
-                        })
-                        .catch(err =>
-                        {
-                            console.log('error: ', err);
-                            context.props.dispatch(UIActions.newNotification('danger', err.message));
-                            context.props.setLoading(false);
-                        });
-                    }}
-                >
-                  Create
-                </Button>
-              </div>
+                            const context = this;
+
+                            console.log('verbose_info: putting ', this.state.new_booking);
+                            // Send request
+                            DataManager.put(this.props.dispatch, DataManager.db_trip_bookings, this.state.new_booking, '/bookings/trips', 'trip_bookings')
+                            .then(res =>
+                            {
+                                console.log('response data: ' + res);
+                                context.props.setTripBookingFormVisible(false);
+                                context.props.dispatch(UIActions.newNotification('success', 'Successfully created your trip booking! We\'ll get back to you soon.'));
+                                
+                                context.props.setLoading(false);
+                            })
+                            .catch(err =>
+                            {
+                                console.log('error: ', err);
+                                context.props.dispatch(UIActions.newNotification('danger', err.message));
+                                context.props.setLoading(false);
+                            });
+                        }}
+                    >
+                    Create
+                    </Button>
+                </div>
             </div>
         );
     }

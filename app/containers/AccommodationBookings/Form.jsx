@@ -84,18 +84,42 @@ export class AccommodationBookingForm extends React.Component
             </div>
             <h1 style={{textAlign: 'center', color: '#fff'}}>Accommodation Search</h1>
             <h2 style={{textAlign: 'center', color: '#fff'}}>Filters</h2>
-            <div ref={filters_container => this.filters_container = filters_container} className='row' style={{border: '1px solid #fff', borderRadius: '5px', maxHeight: '200px', overflowY: 'scroll'}}>
+            {/* Filters Container */}
+            <div
+              ref={filters_container => this.filters_container = filters_container}
+              className='row'
+              style={{
+                border: '1px solid #fff',
+                borderRadius: '5px',
+                maxHeight: '170px',
+                overflowY: 'scroll',
+                boxShadow: 'inset 0px 0px 20px #fff'
+                // background: 'radial-gradient(#343434, #3c3c3c 70%);'
+              }}
+            >
               {
                 this.state.selected_filters.map((filter, index) =>
                 (<div
                   key={filter.name+'_'+filter.value}
                   className='pageItem col-md-6'
-                  style={{background: 'rgba(255,255,255,.7)', borderRadius: '5px', border: '3px solid #343434', padding: '5px'}}
+                  style={{
+                    background: 'rgba(255,255,255,.7)',
+                    borderRadius: '5px',
+                    border: '3px solid #343434',
+                    padding: '5px',
+                    marginTop: '15px'
+                  }}
                   ref={elem => this.filter_container[filter.name+'_'+filter.value] = elem}
                   >
-                  {/* <label className="itemLabel" style={{color:'#fff'}}>Accommodation Destination: </label> */}
+                  {/* Close Button Container */}
                   <div style={{paddingTop: '1px', width: '100%'}} >
-                    <div style={{width: '10px', height: '20px', float: 'right', margin: '-11px -0px 0px 0px'}}>
+                    <div style={{
+                      width: '10px',
+                      height: '20px',
+                      float: 'right',
+                      margin: '-11px -0px 0px 0px'
+                      }}
+                    >
                       <CloseButton
                         className="ion-close-circled"
                         onClick={() =>
@@ -114,6 +138,7 @@ export class AccommodationBookingForm extends React.Component
                       />
                     </div>
                   </div>
+                  {/* Filter inputs */}
                   <ComboBox
                     items={filters}
                     style={{paddingTop: '10px'}}
