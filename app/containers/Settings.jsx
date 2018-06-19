@@ -78,8 +78,8 @@ class Settings extends Component
           <PageHeaderTitle>Settings&nbsp;Header</PageHeaderTitle>
           {!this.settingsSaved() && this.state.canSave && (
             <PageHeaderActions>
-              <Button success onClick={()=>this.props.changeTab('home')}>
-                Home
+              <Button success onClick={()=>this.saveSettingsState()}>
+                Save
               </Button>
             </PageHeaderActions>
           )}

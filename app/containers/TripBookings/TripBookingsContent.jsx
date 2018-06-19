@@ -36,8 +36,6 @@ import CustomButton, { ButtonsGroup } from '../../components/shared/Button';
 import { Field, Part, Row } from '../../components/shared/Part';
 import Logo from '../../components/settings/_partials/profile/Logo';
 
-import Modal from 'react-modal';
-
 // Styles
 import styled from 'styled-components';
 
@@ -55,20 +53,6 @@ import
     PageHeaderActions,
     PageContent,
   } from '../../components/shared/Layout';
-
-
-const modalStyle =
-{
-  content :
-  {
-    top                   : '15%',
-    left                  : '7%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    border                : '2px solid black',
-    minWidth              : window.outerWidth-160, // '950px'
-  }
-};
 
 export class TripBookingsTabContent extends React.Component
 {
@@ -183,7 +167,7 @@ export class TripBookingsTabContent extends React.Component
                         width: '84%',
                         marginTop: '10px',
                         backgroundColor: 'rgba(0, 0, 0, .5)',
-                        minHeight: '480px',
+                        minHeight: tripBooking.trip_type === trip_types[1].type_name ? '465px' : '430px',
                         borderRadius: '10px',
                         padding: '6px',
                         border: '2px solid #3c3c3c'
@@ -263,24 +247,22 @@ export class TripBookingsTabContent extends React.Component
                             <td><p>Date Scheduled:</p></td>
                             <td>
                               <input
-                                ref={(date_scheduled_picker)=>this[tripBooking._id] = date_scheduled_picker}
+                                ref={(date_scheduled_picker)=>this['scheduled_date_'+tripBooking._id] = date_scheduled_picker}
                                 type='date'
                                 defaultValue={formatDate(new Date(tripBooking.date_scheduled))}
                                 onChange={(event) =>
                                   {
                                     this.props.setLoading(true);
 
-                                    console.log('new scheduled date str: ', event.currentTarget.value);
                                     if(!event.currentTarget.value)
                                     {
                                       this.props.setLoading(false);
                                       return console.log('Error: Invalid date. Scheduled date has to be in the future.');
                                     }
                                     const new_date = new Date(event.currentTarget.value);
-                                    console.log('new scheduled date: ', new_date);
+
                                     // date picker counts months from 1, Date object counts months from 0, account for that
                                     const derived_date = new Date(new_date.getFullYear(), new_date.getMonth() + 1, new_date.getDate());
-                                    console.log('formatted scheduled date: ', formatDate(derived_date));
 
                                     if(new_date.getTime() <= new Date().getTime())
                                     {
@@ -296,7 +278,7 @@ export class TripBookingsTabContent extends React.Component
                                     }
                                     
                                     tripBooking.date_scheduled = derived_date.getTime();
-                                    this[tripBooking._id].value = formatDate(derived_date);
+                                    this['scheduled_date_'+tripBooking._id].value = formatDate(derived_date);
                                     // update UI
                                     this.setState({}); // TODO: update GUI from callback
 
@@ -309,47 +291,41 @@ export class TripBookingsTabContent extends React.Component
                             <td><p>Return Date:</p></td>
                             <td>
                               <input
-                                ref={(return_date_picker)=>this[tripBooking._id] = return_date_picker}
+                                ref={(return_date_picker)=>this['return_date_'+tripBooking._id] = return_date_picker}
                                 type='date'
                                 defaultValue={formatDate(new Date(tripBooking.return_date))}
                                 onChange={(event) =>
+                                {
+                                  if(!event.currentTarget.value)
                                   {
-                                    console.log('new return date str: ', event.currentTarget.value);
-                                    if(!event.currentTarget.value)
-                                    {
-                                      this.props.setLoading(false);
-                                      return console.log('Error: Invalid date. Return date has to be in the future.');
-                                    }
-                                    const new_date = new Date(event.currentTarget.value);
-                                    console.log('new return date: ', new_date);
-                                    // date picker counts months from 1, Date object counts months from 0, account for that
-                                    const derived_date = new Date(new_date.getFullYear(), new_date.getMonth() + 1, new_date.getDate());
-                                    console.log('formatted return date: ', formatDate(derived_date));
-                                    
-                                    if(derived_date.getTime() <= new Date().getTime())
-                                    {
-                                      this.props.setLoading(false);
-                                      return this.props.dispatch(UIActions.newNotification('danger', 'Error: date has to be in the future.'));
-                                    }
+                                    this.props.setLoading(false);
+                                    return console.log('Error: Invalid date. Return date has to be in the future.');
+                                  }
+                                  const new_date = new Date(event.currentTarget.value);
+                                  // date picker counts months from 1, Date object counts months from 0, account for that
+                                  const derived_date = new Date(new_date.getFullYear(), new_date.getMonth() + 1, new_date.getDate());
+                                  
+                                  if(derived_date.getTime() <= new Date().getTime())
+                                  {
+                                    this.props.setLoading(false);
+                                    return this.props.dispatch(UIActions.newNotification('danger', 'Error: date has to be in the future.'));
+                                  }
 
-                                    console.log('derived_date>>>>', derived_date.getTime());
-                                    console.log('date_scheduled>>>>', new Date(tripBooking.date_scheduled).getTime());
+                                  if(derived_date.getTime() < new Date(tripBooking.date_scheduled).getTime())
+                                  {
+                                    this.props.setLoading(false);
+                                    return this.props.dispatch(UIActions.newNotification('danger', 'Error: Return date cannot be before the scheduled date.'));
+                                  }
+                                  // update state
+                                  this.props.setLoading(true);
+                                  
+                                  tripBooking.return_date = derived_date.getTime();
+                                  this['return_date_'+tripBooking._id].value = formatDate(derived_date);
+                                  // update UI
+                                  this.setState({}); // TODO: update GUI from callback
 
-                                    if(derived_date.getTime() < new Date(tripBooking.date_scheduled).getTime())
-                                    {
-                                      this.props.setLoading(false);
-                                      return this.props.dispatch(UIActions.newNotification('danger', 'Error: Return date cannot be before the scheduled date.'));
-                                    }
-                                    // update state
-                                    this.props.setLoading(true);
-                                    
-                                    tripBooking.return_date = derived_date.getTime();
-                                    this[tripBooking._id].value = formatDate(derived_date);
-                                    // update UI
-                                    this.setState({}); // TODO: update GUI from callback
-
-                                    this.handleBookingUpdate(tripBooking);
-                                  }}
+                                  this.handleBookingUpdate(tripBooking);
+                                }}
                               />
                             </td>
                           </tr>

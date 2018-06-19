@@ -117,7 +117,7 @@ class Login extends Component
     dispatch(MaterialActions.getMaterials());
     dispatch(TripBookingActions.getTripBookings());
     dispatch(AccommodationBookingActions.getAccommodationBookings());
-    dispatch(AccommodationDestinationActions.getAccommodationDestinations());
+    // dispatch(AccommodationDestinationActions.getAccommodationDestinations());
   }
 
   // Render Main Content
@@ -155,7 +155,7 @@ class Login extends Component
                 width: '100%',
                 height: '180px',
                 // float: 'right',
-                marginTop: '-180px',
+                marginTop: '-50px',
                 // marginRight: 'auto',
                 // marginLeft: 'auto',
                 // marginTop: '-67px',
@@ -166,7 +166,7 @@ class Login extends Component
               />
               <div
                 className='row'
-                style={{marginTop: '20px'}}
+                style={{marginTop: '10px'}}
               >
                 <div className="pageItem col-md-12">
                   <label className="itemLabel" style={{color: '#fff'}}>Username</label>

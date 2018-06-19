@@ -41,7 +41,7 @@ function Other({
           </ExportDir>
         </Field>
       </Row>
-      <Row>
+      {/*<Row>
         <Field>
           <label className="itemLabel">Template</label>
           <select name="template" value={template} onChange={handleInputChange}>
@@ -96,7 +96,7 @@ function Other({
             </option>
           </select>
         </Field>
-      </Row>
+      </Row> */}
     </Part>,
   ];
 }

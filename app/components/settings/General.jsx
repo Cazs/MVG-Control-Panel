@@ -107,7 +107,7 @@ class General extends Component
               </select>
             </div>
           </div>
-          <div className="col-md-6">
+          {/* <div className="col-md-6">
             <div className="pageItem">
               <label className="itemLabel">Mute</label>
               <label className="switch">
@@ -120,7 +120,7 @@ class General extends Component
                 <span className="slider round" />
               </label>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="row">
           {/* <div className="col-md-6">
@@ -143,7 +143,7 @@ class General extends Component
               </select>
             </div>
           </div> */}
-          <div className="col-md-6">
+          {/* <div className="col-md-6">
             <div className="pageItem">
               <label className="itemLabel">Open&nbsp;PDF&nbsp;Reader</label>
               <label className="switch">
@@ -156,7 +156,7 @@ class General extends Component
                 <span className="slider round" />
               </label>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="row">
           <Other

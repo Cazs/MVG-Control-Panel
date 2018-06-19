@@ -8,6 +8,8 @@ import { isEqual } from 'lodash';
 // Components
 import Button from '../../components/shared/Button';
 import Slider from '../../components/slideshow/Slider';
+import MessageModal from '../../components/shared/MessageModal';
+import Modal from 'react-modal';
 
 // Actions
 import * as ACTION_TYPES from '../../constants/actions.jsx';
@@ -31,18 +33,18 @@ import _withFadeInAnimation from '../../components/shared/hoc/_withFadeInAnimati
 import styled from 'styled-components';
 
 const Profile = styled.div`
-  float: left;
-  width: 90px;
-  height: 115%;
-  background: url(../static/images/profile_minimal.png);
+float: left;
+width: 90px;
+height: 115%;
+background: url(../static/images/profile_minimal.png);
+background-size: fill;
+background-repeat: no-repeat;
+&:hover
+{
+  background: url(../static/images/profile.png);
   background-size: fill;
   background-repeat: no-repeat;
-  &:hover
-  {
-    background: url(../static/images/profile.png);
-    background-size: fill;
-    background-repeat: no-repeat;
-  }
+}
 `;
 
 require('./home-style.css');
@@ -53,6 +55,21 @@ const images = [
   '../static/images/slider/3.jpg',
 ];
 
+const centerOnPrimaryDisplay = require('../../../helpers/center-on-primary-display');
+
+const modalStyle =
+{
+  content :
+  {
+    top                   : '15%',
+    left                  : '7%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    border                : '2px solid black',
+    minWidth              : window.outerWidth-160, // '950px'
+  }
+};
+
 // Component
 class Home extends Component
 {
@@ -61,13 +78,24 @@ class Home extends Component
     super(props);
     this.setTripBookingFormVisible = this.setTripBookingFormVisible.bind(this);
     this.setAccommodationBookingFormVisible = this.setAccommodationBookingFormVisible.bind(this);
+    this.showMessageDialog = this.showMessageDialog.bind(this);
 
     this.state =
     {
       trip_booking_popover_visible: false,
       accommodation_booking_popover_visible: false,
+      message_dialog_visible: false,
 
-      profile_menu_visible: false
+      profile_menu_visible: false,
+
+      new_message:
+      {
+        subject: null,
+        message: null,
+        receiver: null,
+        creator: null,
+        date_logged: new Date().getTime()
+      }
     };
   }
 
@@ -89,10 +117,223 @@ class Home extends Component
       });
   }
 
+  showMessageDialog()
+  {
+    this.setState({message_dialog_visible: true});
+  }
+
+  openModal()
+  {
+    this.setState({ is_modal_open: true });
+  }
+  
+  afterOpenModal()
+  {
+    // references are now sync'd and can be accessed.
+    // this.subtitle.style.color = '#2FA7FF';
+  }
+  
+  closeModal()
+  {
+    this.setState({is_modal_open: false});
+  }
+
   // Render Main Content
 
   render()
   {
+    const msg_modal = (
+      <Modal
+        isOpen={this.state.message_dialog_visible}
+        onAfterOpen={this.afterOpenModal}
+        onRequestClose={this.closeModal}
+        style={modalStyle}
+        contentLabel="New Message"
+      >
+        <h2 ref={subtitle => this.subtitle = subtitle} style={{color: 'black'}}>New Message</h2>
+        <div>
+            <div className="row">
+                <div className="pageItem col-sm-12">
+                <label className="itemLabel">To:</label>
+                <input
+                    ref={(txt_subject)=>this.txt_subject = txt_subject}
+                    name="recipient"
+                    type="text"
+                    onChange={(new_val)=>
+                        {
+                        const message = this.state.new_message;
+                        message.subject = new_val.currentTarget.value;
+
+                        this.setState({new_message: message});
+                        }}
+                    style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
+                />
+                </div>
+            </div>
+            <div className="row">
+                <div className="pageItem col-sm-12">
+                <label className="itemLabel">Subject</label>
+                <input
+                    ref={(txt_subject)=>this.txt_subject = txt_subject}
+                    name="subject"
+                    type="text"
+                    onChange={(new_val)=>
+                        {
+                        const message = this.state.new_message;
+                        message.subject = new_val.currentTarget.value;
+
+                        this.setState({new_message: message});
+                        }}
+                    style={{border: '1px solid #2FA7FF', borderRadius: '3px'}}
+                />
+                </div>
+            </div>
+
+            <div className="row">
+                <div className="pageItem col-sm-12">
+                    <label className="itemLabel">Message</label>
+                    <textarea
+                        name="message"
+                        ref={(txt_message)=>this.txt_message = txt_message}
+                        onChange={(new_val)=>
+                            {
+                                const message = this.state.new_message;
+                                message.message = new_val.currentTarget.value;
+                                this.setState({new_message: message});
+                            }}
+                        style={{border: '1px solid #2FA7FF', borderRadius: '3px', width: '100%'}}
+                    />
+                </div>
+            </div>
+
+          <Button
+            onClick={this.closeModal}
+            style={{width: '120px', height: '50px', float: 'right'}}
+            danger
+          >Dismiss
+          </Button>
+
+          <Button
+            onClick={()=>
+            {
+              if(sessionManager.getSessionUser().access_level <= GlobalConstants.ACCESS_LEVELS[1].level) // standard access & less are not allowed
+              {
+                this.props.dispatch(
+                {
+                  type: ACTION_TYPES.UI_NOTIFICATION_NEW,
+                  payload: {type: 'danger', message: 'You are not authorised to create quotes.'}
+                });
+                return;
+              }
+
+              this.props.setLoading(true);
+              this.setState({is_new_quote_modal_open: false});
+
+              const quote = this.state.new_quote;
+
+              if(!quote.client)
+              {
+                this.props.setLoading(false);
+                this.setState({is_new_quote_modal_open: true});
+                return this.props.dispatch(
+                {
+                  type: ACTION_TYPES.UI_NOTIFICATION_NEW,
+                  payload:
+                  {
+                    type: 'danger',
+                    message: 'Invalid client selected'
+                  }
+                });
+              }
+
+              if(!quote.contact)
+              {
+                this.props.setLoading(false);
+                this.setState({is_new_quote_modal_open: true});
+
+                return this.props.dispatch(
+                {
+                  type: ACTION_TYPES.UI_NOTIFICATION_NEW,
+                  payload:
+                  {
+                    type: 'danger',
+                    message: 'Invalid contact person selected'
+                  }
+                });
+              }
+
+              if(!quote.sitename)
+              {
+                this.props.setLoading(false);
+                this.setState({is_new_quote_modal_open: true});
+                
+                return this.props.dispatch(
+                {
+                  type: ACTION_TYPES.UI_NOTIFICATION_NEW,
+                  payload:
+                  {
+                    type: 'danger',
+                    message: 'Invalid sitename'
+                  }
+                });
+              }
+              
+              if(!quote.request)
+              {
+                this.props.setLoading(false);
+                this.setState({is_new_quote_modal_open: true});
+
+                return this.props.dispatch(
+                {
+                  type: ACTION_TYPES.UI_NOTIFICATION_NEW,
+                  payload:
+                  {
+                    type: 'danger',
+                    message: 'Error: Invalid quote description',
+                  },
+                });
+              }
+
+              // Prepare Quote
+              const client_name = quote.client.client_name.toString();
+              quote.object_number = this.props.quotes.length;
+              quote.client_name = client_name;
+              quote.client_id = quote.client._id;
+              quote.contact_person = quote.contact.name;
+              quote.contact_person_id = quote.contact.usr;
+              quote.status = statuses[0].status;
+              quote.status_description = statuses[0].status_description;
+              quote.revision = 1;
+              quote.account_name = client_name.toLowerCase().replace(' ', '-');
+              quote.creator_name = sessionManager.getSessionUser().name;
+              quote.creator = sessionManager.getSessionUser().usr;
+              quote.creator_employee = sessionManager.getSessionUser();
+              quote.date_logged = new Date().getTime();// current date in epoch millis
+              quote.logged_date = formatDate(new Date()); // current date
+
+              const context = this;
+              // dispatch action to create quote on local & remote stores
+              this.props.dispatch(
+              {
+                type: ACTION_TYPES.QUOTE_NEW,
+                payload: quote,
+                // after the quote has been added to local & remote store, push it to the table
+                callback(new_quote)// w/ _id
+                {
+                  context.props.setLoading(false);
+                  context.setState({is_new_quote_modal_open: false});
+                  context.props.quotes.push(new_quote);
+                  context.setState({new_quote: context.newQuote(), is_new_quote_modal_open: false});
+                }
+              });
+            }}
+            style={{width: '120px', height: '50px', float: 'left'}}
+            success
+          >Send
+          </Button>
+        </div>
+      </Modal>);
+
     return (
       <PageWrapper>
         <PageHeader>
@@ -152,15 +393,17 @@ class Home extends Component
               <br />
               <Button primary style={{width: '200px', height: '30px', marginTop: '15px'}} onClick={()=>this.props.changeTab('accommodation-bookings')}>Accommodation&nbsp;Bookings</Button>
               <br />
-              <Button primary style={{width: '200px', height: '30px', marginTop: '15px'}} onClick={()=>this.props.changeTab('trip-history')}>Trip&nbsp;History</Button>
+              {/* <Button primary style={{width: '200px', height: '30px', marginTop: '15px'}} onClick={()=>this.props.changeTab('trip-history')}>Trip&nbsp;History</Button>
               <br />
               <Button primary style={{width: '200px', height: '30px', marginTop: '15px'}} onClick={()=>this.props.changeTab('accommodation-history')}>Accommodation&nbsp;History</Button>
+              <br /> */}
+              <Button primary style={{width: '200px', height: '30px', marginTop: '15px'}} onClick={()=>this.showMessageDialog()}>Send Message</Button>
               <br />
-              <Button primary style={{width: '200px', height: '30px', marginTop: '15px'}} onClick={()=>this.props.changeTab('invoices')}>Settings</Button>
+              <Button primary style={{width: '200px', height: '30px', marginTop: '15px'}} onClick={()=>this.props.changeTab('settings')}>Settings</Button>
             </div>
           </div>
 
-          {/* Buttons Container */}
+          {/* Buttons & Form Container */}
 
           <div
             style={{
@@ -168,11 +411,11 @@ class Home extends Component
               top: '30%',
               right: '100px',
               borderRadius: '10px',
-              display: 'inline-block',
               zIndex: 100
             }}
           >
 
+            {/* Forms */}
             <TripBookingForm 
               style={{margin: '0px 0px 0px 0px'}}
               setTripBookingFormVisible={this.setTripBookingFormVisible}
@@ -190,40 +433,45 @@ class Home extends Component
               dispatch={this.props.dispatch}
             />
             
-            <Button
-              primary
-              style={{width: '140px', height: '60px'}}
-              onClick={()=>
-              {
-                this.setTripBookingFormVisible(!this.state.trip_booking_popover_visible);
-              }}
-            >
-              Transport
-            </Button>
-            <br />
-              
-            <Button
-              primary
-              style={{width: '140px', height: '60px', marginTop: '20px'}}
-              ref={(btn)=>this.btnAccommodation = btn}
-              onClick={(evt)=>
-              {
-                this.setAccommodationBookingFormVisible(!this.state.accommodation_booking_popover_visible);
-              }}
-            >
-              Accommodation
-            </Button>
-            <br />
-              
-            <Button
-              primary
-              style={{width: '140px', height: '60px', marginTop: '20px'}}
-              onClick={()=>
-              {
-              }}
-            >
-              Experiences
-            </Button>
+            {/* Buttons */}
+            <div style={{
+              display: this.state.trip_booking_popover_visible || this.state.accommodation_booking_popover_visible ? 'none' : 'inline-block'
+            }}>
+              <Button
+                primary
+                style={{width: '140px', height: '60px'}}
+                onClick={() =>
+                {
+                  this.setTripBookingFormVisible(!this.state.trip_booking_popover_visible);
+                }}
+              >
+                Transport
+              </Button>
+              <br />
+                
+              <Button
+                primary
+                style={{width: '140px', height: '60px', marginTop: '20px'}}
+                ref={(btn)=>this.btnAccommodation = btn}
+                onClick={(evt)=>
+                {
+                  this.setAccommodationBookingFormVisible(!this.state.accommodation_booking_popover_visible);
+                }}
+              >
+                Accommodation
+              </Button>
+              <br />
+                
+              <Button
+                primary
+                style={{width: '140px', height: '60px', marginTop: '20px'}}
+                onClick={()=>
+                {
+                }}
+              >
+                Experiences
+              </Button>
+            </div>
           </div>
 
           {/* Slider */}
@@ -242,6 +490,7 @@ class Home extends Component
               index={0}
             />
           </div>
+          {msg_modal}
         </PageContent>
       </PageWrapper>
     );

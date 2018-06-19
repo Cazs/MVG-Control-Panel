@@ -32,7 +32,7 @@ const allTabs =
     name: 'accommodation-bookings',
     icon: 'ios-bed',
   },
-  {
+  /*{
     title: 'Trip History',
     name: 'trip-history',
     icon: 'ios-car',
@@ -41,7 +41,7 @@ const allTabs =
     title: 'Accommodation History',
     name: 'accommodation-history',
     icon: 'ios-briefcase',
-  },
+  },*/
   {
     title: 'Messages',
     name: 'messages',

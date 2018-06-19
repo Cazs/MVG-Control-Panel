@@ -10,6 +10,7 @@ const TabsStyle = styled.div`
   border-top: 1px solid rgba(0,0,0,.6);
   border-bottom: 1px solid rgba(0,0,0,.4);
   box-shadow: 0px 0px 9px #3c3c3c;
+  margin-top: 23px;
 `;
 
 const TabStyle = styled.a`
