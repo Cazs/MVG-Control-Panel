@@ -58,7 +58,7 @@ export class AccommodationBookingForm extends React.Component
     {
       const filters = ['name', 'description', 'cost_per_night_adults', 'cost_per_night_children', 'country', 'state_province', 'city', 'town', 'street', 'unit_number', 'zip_code', 'rating'];
 
-        return (
+      return (
         <div>
           {/* Filters container */}
           <div
@@ -93,7 +93,7 @@ export class AccommodationBookingForm extends React.Component
                 borderRadius: '5px',
                 maxHeight: '170px',
                 overflowY: 'scroll',
-                boxShadow: 'inset 0px 0px 20px #fff'
+                boxShadow: 'inset 0px 0px 15px #fff'
                 // background: 'radial-gradient(#343434, #3c3c3c 70%);'
               }}
             >
@@ -105,7 +105,7 @@ export class AccommodationBookingForm extends React.Component
                   style={{
                     background: 'rgba(255,255,255,.7)',
                     borderRadius: '5px',
-                    border: '3px solid #343434',
+                    border: '5px solid #343434',
                     padding: '5px',
                     marginTop: '15px'
                   }}
@@ -275,7 +275,7 @@ export class AccommodationBookingForm extends React.Component
                 {
                   this.props.setLoading(true);
 
-                  if(!this.state.selected_filters.length > 0)
+                  /*if(!this.state.selected_filters.length > 0)
                   {
                     this.props.setLoading(false);
                     return this.props.dispatch(UIActions.newNotification('danger', 'Please choose at least one valid search filter'));
@@ -303,7 +303,7 @@ export class AccommodationBookingForm extends React.Component
                   {
                     this.props.setLoading(false);
                       return this.props.dispatch(UIActions.newNotification('danger', 'Children or adult count must be greater than 0.'));
-                  }
+                  }*/
 
                   const context = this;
 
@@ -316,7 +316,22 @@ export class AccommodationBookingForm extends React.Component
                               {
                                 context.props.setLoading(false);
                                 console.log('response data: ', res);
-                                context.setState({accommodationDestinations: res ? res.data : [], is_loading_destinations: false});
+                                if(res)
+                                {
+                                  if(Array.isArray(res.data)) // if using searchAccommodations server API, i.e. searching with filters
+                                    context.setState(
+                                    {
+                                      accommodationDestinations: res.data,
+                                      is_loading_destinations: false
+                                    });
+                                  else if(res.data && res.data._embedded)// else if using hypermedia responses (i.e. getAll AccommodationDestinations), extract data
+                                    context.setState(
+                                    {
+                                      accommodationDestinations: res.data._embedded.accommodation_destinations,
+                                      is_loading_destinations: false
+                                    });
+                                  else console.log('error: invalid server response.');
+                                } else console.log('error: invalid server response.');
                                 console.log('destinations: ', this.state.accommodationDestinations);
                                 // context.props.setAccommodationBookingFormVisible(false);
                                 // context.props.dispatch(UIActions.newNotification('success', 'Successfully created your trip booking! We\'ll get back to you soon.'));
@@ -337,21 +352,24 @@ export class AccommodationBookingForm extends React.Component
           <div
             style={{
               float: 'left',
-              width: '600px',
+              width: '500px',
+              maxHeight: '550px',
+              overflowY: 'scroll',
               backgroundColor: 'rgba(0,0,0,.9)',
               boxShadow: '0px 0px 35px #000',
               borderRadius: '10px',
+              border: '2px solid #fff',
               zIndex: 100,
               padding: '15px',
               margin: '-120px 20px 0px 0px'
             }}
-            hidden={!this.props.popover_visible}
+            hidden={!this.props.popover_visible || this.state.accommodationDestinations.length == 0}
           >
             <div className="row">
               {this.state.accommodationDestinations.map(destination =>
               (
                 <div
-                  className="pageItem col-lg-6"
+                  className="pageItem col-lg-12"
                   style={{
                     
                   }}
@@ -364,11 +382,24 @@ export class AccommodationBookingForm extends React.Component
                     padding: '5px',
                     margin: 'auto'
                     }}>
-                    <label className="itemLabel" style={{color:'#fff'}}>Name: {destination.name}</label>
-                    <label className="itemLabel" style={{color:'#fff'}}>Summary: {destination.description}</label>
-                    <p style={{color:'#000', textAlign: 'center'}}>Cost per night</p>
+                    <label className="itemLabel" style={{color:'#fff', textAlign: 'center'}}>Name: {destination.name}</label>
+                    <p style={{textAlign: 'center', color: '#3c3c3c'}}>&quot;{destination.description}&quot;</p>
+                    <p style={{color:'#000', textAlign: 'center', textDecoration: 'underline'}}>Cost per night</p>
                     <label className="itemLabel" style={{color:'#fff'}}>Adults: {destination.currency}&nbsp;{destination.cost_per_night_adults}</label>
                     <label className="itemLabel" style={{color:'#fff'}}>Children: {destination.currency}&nbsp;{destination.cost_per_night_children}</label>
+                    <label className="itemLabel" style={{color:'#fff'}}>Address:</label>
+                    <p style={{textAlign: 'left', color: '#3c3c3c'}}>
+                      {destination.unit_number}&nbsp;{destination.street}, 
+                       {destination.town}, {destination.city}, {destination.state_province}, 
+                      <br />
+                      {destination.country}
+                      <br />
+                      {destination.zip_code}
+                    </p>
+                    <label className="itemLabel" style={{color:'#fff'}}>Rating: {destination.rating}</label>
+                    <button className="btn btn-success" style={{width: '120px', height: '50px', margin: '0px 0px 0px 34%'}}>
+                      Book
+                    </button>
                   </div>
                 </div>
               ))}

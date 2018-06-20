@@ -469,7 +469,7 @@ class Home extends Component
                 {
                 }}
               >
-                Experiences
+                Packages
               </Button>
             </div>
           </div>
